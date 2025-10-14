@@ -101,7 +101,7 @@
   <div class="ver">
     <span>패치버전 v2.0 · <span class="muted">문의사항 : 디스코드 이더</span></span>
         <a class="btn ghost" id="btnDict" href="./petsfilter.html">페트 사전</a>
-    <button class="btn ghost" id="btnAdmin">★</button>
+    <button class="btn ghost" id="btnAdmin">관리자 페이지</button>
   </div>
 </header>
 
@@ -435,10 +435,7 @@ window.addEventListener('resize', hideTip);
 
 /* ===== 관리자 버튼 ===== */
 document.getElementById('btnAdmin').addEventListener('click', ()=>{
-  const pw = prompt('관리자 암호를 입력하세요.');
-  if (pw === null) return;
-  if (pw === ADMIN_PASS) location.href = "./admin.html";
-  else alert('암호가 올바르지 않습니다.');
+  location.href = "./admin.html";
 });
 
 /* ========= 초성 키패드 ========= */
