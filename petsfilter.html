@@ -698,7 +698,7 @@ async function adminUnlock() {
 }
 
 /* ========== 이벤트 바인딩 ========== */
-$("#adminLoginBtn").addEventListener("click", async ()=>{ await adminUnlock(); render(); });
+$("#adminLoginBtn").addEventListener("click", ()=>{window.location.href = "admin.html"; });
 $("#toggleEditBtn")?.addEventListener("click", ()=>{ if (!ADMIN) return; EDIT_MODE = !EDIT_MODE; render(); });
 $("#exportCsv")?.addEventListener("click", ()=>{ if(!ADMIN) return; const rows = currentFiltered(); download("stoneage_pets_filtered.csv", toCSV(rows), "text/csv;charset=utf-8"); });
 $("#exportJson")?.addEventListener("click", ()=>{ if(!ADMIN) return; download("pets_filter.json", JSON.stringify(PETS, null, 2), "application/json;charset=utf-8"); });
