@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NOVA PET ADMIN — 오버라이드 + 8확정 집계</title>
-<script src="assets/js/decimal.min.js"></script>
+<title>NOVA PET ADMIN</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
 <style>
   :root{
     --bg:#0f1115; --panel:#161a22; --muted:#8a9099; --accent:#6aa0ff;
@@ -107,18 +107,18 @@
       <h2>NOVA PET ADMIN</h2>
       <div class="muted" style="font-size:13px">접근을 위해 비밀번호를 입력하세요.</div>
       <div class="row">
-        <input id="gate_pass" type="type" placeholder="Password" autocomplete="current-password" />
+        <input id="gate_pass" type="password" placeholder="Password" autocomplete="current-password" />
         <button id="gate_btn">입장</button>
       </div>
       <div id="gate_err" class="err"></div>
       <label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:#8a9099">
-        <input id="gate_rem" type="checkbox" /> 브라우저 탭에서 2시간 기억하기
+        <input id="gate_rem" type="checkbox" /> 비밀번호 저장하기
       </label>
     </div>
   </div>
 
 <header>
-  <div class="brand">NOVA PET ADMIN</div>
+  <div class="brand">NOVA PET ADMIN — 오버라이드 + 8확정 집계</div>
   <div class="right">
     <button class="btn" id="btnReload">원격 새로고침</button>
     <button class="btn ghost" id="btnExport">로컬 다운로드</button>
@@ -239,10 +239,10 @@ async function sha256Hex(text){
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 function getSess(){
-  try{ return JSON.parse(sessionStorage.getItem("nova_admin_ok")||"null"); }catch{ return null; }
+  try{ return JSON.parse(localStorage.getItem("nova_admin_ok")||"null"); }catch{ return null; }
 }
-function setSess(){
-  sessionStorage.setItem("nova_admin_ok", JSON.stringify({h:ADMIN_PASSWORD_HASH, t:Date.now()}));
+function setSessPersistent(){
+  localStorage.setItem("nova_admin_ok", JSON.stringify({h:ADMIN_PASSWORD_HASH, t:Date.now()}));
 }
 function sessValid(){
   const s = getSess();
@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     try{
       const hex = await sha256Hex(p);
       if(hex === ADMIN_PASSWORD_HASH){
-        if(rem && rem.checked) setSess();
+        if(rem && rem.checked) setSessPersistent();  // sessionStorage -> localStorage
         unlock();
       }else{
         err.textContent = "비밀번호가 올바르지 않습니다.";
@@ -413,69 +413,6 @@ function inferKU_STRICT(S0, SG){
     }
   }
   return null;
-}
-
-  // Relaxed 근사 추정 모드 (STRICT 실패 시 자동호출용)
-function inferKU_Relaxed(s0Arr, sg, opt = {}) {
-  const { tolK = 2, tolStat = 0.15, verbose = false } = opt;
-
-  // s0Arr: [hp, atk, def, agi]
-  // sg: { hp, atk, def, agi }
-
-  if (!s0Arr || !sg) return null;
-
-  // 기본 k값 후보군 (24~28 정도가 일반적)
-  const kCandidates = [];
-  for (let k = 20 - tolK; k <= 30 + tolK; k++) kCandidates.push(k);
-
-  // 최적 결과를 저장할 변수
-  let best = null;
-  let minErr = Infinity;
-
-  // u 후보를 정수 10~40 사이에서 탐색
-  const range = [10, 40];
-
-  for (const k of kCandidates) {
-    for (let hp = range[0]; hp <= range[1]; hp++) {
-      for (let atk = range[0]; atk <= range[1]; atk++) {
-        for (let def = range[0]; def <= range[1]; def++) {
-          for (let agi = range[0]; agi <= range[1]; agi++) {
-            // 예상 sg 계산
-            const est_sg = {
-              hp: (s0Arr[0] * (hp / k)) / 5,
-              atk: (s0Arr[1] * (atk / k)) / 5,
-              def: (s0Arr[2] * (def / k)) / 5,
-              agi: (s0Arr[3] * (agi / k)) / 5,
-            };
-
-            // 실제 sg와 비교
-            const err =
-              Math.abs((est_sg.hp - sg.hp) / sg.hp) +
-              Math.abs((est_sg.atk - sg.atk) / sg.atk) +
-              Math.abs((est_sg.def - sg.def) / sg.def) +
-              Math.abs((est_sg.agi - sg.agi) / sg.agi);
-
-            if (err < minErr && err < tolStat * 4) {
-              minErr = err;
-              best = {
-                k,
-                u: { hp, atk, def, agi },
-                err,
-              };
-            }
-          }
-        }
-      }
-    }
-  }
-
-  if (best && verbose) {
-    console.log(
-      `Relaxed 근사해 찾음 → k=${best.k}, u=(${best.u.hp}, ${best.u.atk}, ${best.u.def}, ${best.u.agi}), err=${best.err.toFixed(4)}`
-    );
-  }
-
-  return best;
 }
 
 
@@ -697,55 +634,29 @@ $("btnNew").addEventListener("click", ()=>{
 });
 searchEl.addEventListener("input", renderList);
 
-// ====== S0/SG로 k/u 추정 ======
-$("btnSolve").addEventListener("click", () => {
-  const s0 = {
-    hp: num($("s0_hp").value),
-    atk: num($("s0_atk").value),
-    def: num($("s0_def").value),
-    agi: num($("s0_agi").value)
-  };
-  const sg = {
-    hp: num($("sg_hp").value),
-    atk: num($("sg_atk").value),
-    def: num($("sg_def").value),
-    agi: num($("sg_agi").value)
-  };
-
-  if (![s0.hp, s0.atk, s0.def, s0.agi].every(Number.isFinite) ||
-      ![sg.hp, sg.atk, sg.def, sg.agi].every(Number.isFinite)) {
-    alert("S0과 SG의 모든 값을 입력해야 합니다.");
-    return;
+// [버튼] S0/SG로 k/u 추정
+$("btnSolve").addEventListener("click", ()=>{
+  const f = gatherForm();
+  if(!f || !f.name){ alert("이름을 입력하세요."); return; }
+  if([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi].some(v=>v==null) ||
+     [f.sg.hp,f.sg.atk,f.sg.def,f.sg.agi].some(v=>v==null)){
+    alert("S0/SG를 모두 채워 주세요."); return;
   }
+  const sol = inferKU_STRICT([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi], f.sg);
+  if(!sol){ alert("계산할 수 없는 값입니다(STRICT 해 없음)."); return; }
 
-  const result = inferKU_STRICT(s0, sg);
+  // 자동 기입 = 짜얄 u
+  $("ku_k").value   = sol.k;
+  $("ku_hp").value  = sol.u.hp;
+  $("ku_atk").value = sol.u.atk;
+  $("ku_def").value = sol.u.def;
+  $("ku_agi").value = sol.u.agi;
+  $("ovr_check").checked = true;
 
-  if (result) {
-    $("ku_k").value = result.k;
-    $("ku_hp").value = result.u.hp;
-    $("ku_atk").value = result.u.atk;
-    $("ku_def").value = result.u.def;
-    $("ku_agi").value = result.u.agi;
-    $("ovr_check").checked = true;
-    updateConsistency();
-    alert(`추정 완료!\nk=${result.k}, u=[${result.u.hp},${result.u.atk},${result.u.def},${result.u.agi}]`);
-  } else {
-    // STRICT 실패 시 Relaxed 근사 모드 사용
-    const relaxed = inferKU_Relaxed([s0.hp, s0.atk, s0.def, s0.agi], sg);
-    if (relaxed) {
-      $("ku_k").value = relaxed.k;
-      $("ku_hp").value = relaxed.u.hp;
-      $("ku_atk").value = relaxed.u.atk;
-      $("ku_def").value = relaxed.u.def;
-      $("ku_agi").value = relaxed.u.agi;
-      $("ovr_check").checked = true;
-      updateConsistency();
-      alert(`근사 추정 완료 (Relaxed)\nk=${relaxed.k}, u=[${relaxed.u.hp},${relaxed.u.atk},${relaxed.u.def},${relaxed.u.agi}]`);
-    } else {
-      alert("추정 실패: STRICT 및 RELAXED 모드 모두 해를 찾지 못했습니다.");
-    }
-  }
+  updateConsistency();
+  alert(`추정 완료: k=${sol.k}, u=(${sol.u.hp},${sol.u.atk},${sol.u.def},${sol.u.agi})`);
 });
+
 
 ["ovr_check","ku_k","ku_hp","ku_atk","ku_def","ku_agi","s0_hp","s0_atk","s0_def","s0_agi","sg_hp","sg_atk","sg_def","sg_agi"]
   .forEach(id => $(id).addEventListener("input", updateConsistency));
