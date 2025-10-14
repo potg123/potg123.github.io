@@ -1,1 +1,1 @@
-nova calculator
+nova pet calculator
