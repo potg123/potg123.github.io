@@ -415,6 +415,69 @@ function inferKU_STRICT(S0, SG){
   return null;
 }
 
+  // Relaxed 근사 추정 모드 (STRICT 실패 시 자동호출용)
+function inferKU_Relaxed(s0Arr, sg, opt = {}) {
+  const { tolK = 2, tolStat = 0.15, verbose = false } = opt;
+
+  // s0Arr: [hp, atk, def, agi]
+  // sg: { hp, atk, def, agi }
+
+  if (!s0Arr || !sg) return null;
+
+  // 기본 k값 후보군 (24~28 정도가 일반적)
+  const kCandidates = [];
+  for (let k = 20 - tolK; k <= 30 + tolK; k++) kCandidates.push(k);
+
+  // 최적 결과를 저장할 변수
+  let best = null;
+  let minErr = Infinity;
+
+  // u 후보를 정수 10~40 사이에서 탐색
+  const range = [10, 40];
+
+  for (const k of kCandidates) {
+    for (let hp = range[0]; hp <= range[1]; hp++) {
+      for (let atk = range[0]; atk <= range[1]; atk++) {
+        for (let def = range[0]; def <= range[1]; def++) {
+          for (let agi = range[0]; agi <= range[1]; agi++) {
+            // 예상 sg 계산
+            const est_sg = {
+              hp: (s0Arr[0] * (hp / k)) / 5,
+              atk: (s0Arr[1] * (atk / k)) / 5,
+              def: (s0Arr[2] * (def / k)) / 5,
+              agi: (s0Arr[3] * (agi / k)) / 5,
+            };
+
+            // 실제 sg와 비교
+            const err =
+              Math.abs((est_sg.hp - sg.hp) / sg.hp) +
+              Math.abs((est_sg.atk - sg.atk) / sg.atk) +
+              Math.abs((est_sg.def - sg.def) / sg.def) +
+              Math.abs((est_sg.agi - sg.agi) / sg.agi);
+
+            if (err < minErr && err < tolStat * 4) {
+              minErr = err;
+              best = {
+                k,
+                u: { hp, atk, def, agi },
+                err,
+              };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (best && verbose) {
+    console.log(
+      `Relaxed 근사해 찾음 → k=${best.k}, u=(${best.u.hp}, ${best.u.atk}, ${best.u.def}, ${best.u.agi}), err=${best.err.toFixed(4)}`
+    );
+  }
+
+  return best;
+}
+
 
 /* ====== R8 집계 엔진 ====== */
 function collectR8ObsForKU(k,u){ // u는 짜얄
