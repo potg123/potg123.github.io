@@ -531,9 +531,19 @@ function petCard(p) {
 }
 
 function sortRows(rows, f) {
-  // 항상 이름 가나다순으로 정렬
+  const key = f.attrPick;
+
+  // 전체 또는 듀얼이면 이름 가나다순
+  if (!key || key === "전체" || key === "듀얼") {
+    return rows.slice().sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  }
+
+  // 특정 속성 선택 시 속성 값 내림차순 + 이름순
   return rows.slice().sort((a, b) => {
-    return (a.name || "").localeCompare(b.name || "");
+    const va = (a.attr && typeof a.attr[key] === "number") ? a.attr[key] : 0;
+    const vb = (b.attr && typeof b.attr[key] === "number") ? b.attr[key] : 0;
+    if (vb !== va) return vb - va; // 속성 높은 순
+    return (a.name || "").localeCompare(b.name || ""); // 값 같으면 이름순
   });
 }
 
