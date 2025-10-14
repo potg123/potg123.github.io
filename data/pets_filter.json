@@ -1499,7 +1499,7 @@
     },
     "grow": {
       "hp": 10.14,
-      "atk": 2,
+      "atk": 2.00,
       "def": 1.23,
       "agi": 1.64
     },
@@ -3163,7 +3163,7 @@
     },
     "grow": {
       "hp": 9.86,
-      "atk": 1.9,
+      "atk": 1.90,
       "def": 1.43,
       "agi": 1.57
     },
@@ -3763,7 +3763,7 @@
       "hp": 11.64,
       "atk": 1.66,
       "def": 2.21,
-      "agi": 0.8
+      "agi": 0.80
     },
     "route": "아름산의 동굴 지하 7층 (동42, 남23) 포획",
     "mount": false,
@@ -4075,7 +4075,7 @@
       "hp": 10.05,
       "atk": 1.97,
       "def": 1.59,
-      "agi": 1.4
+      "agi": 1.40
     },
     "route": "마리너스 앞마당 포획",
     "mount": false,
@@ -7331,7 +7331,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/69a4a14b3f4c5839b7292aef0c8409f6_Ifm3laSX_7d3230621992baa4a71a70b6dc3df08eaece525d.gif"
   },
-  {
+    {
     "name": "체루루",
     "searchable": true,
     "grade": "일반",
@@ -7348,7 +7348,7 @@
       "agi": 9.49
     },
     "grow": {
-      "hp": 9.9,
+      "hp": 9.90,
       "atk": 2.15,
       "def": 1.25,
       "agi": 1.66
@@ -7357,7 +7357,7 @@
     "mount": true,
     "img": "https://stoneage001.com/data/file/board23/157bf01a1746a3749294bca554ba4c34_vok4DzBj_633e051141204fa70bbedca76083b78c7c78c048.gif"
   },
-  {
+    {
     "name": "메피노",
     "searchable": true,
     "grade": "일반",
@@ -7375,7 +7375,7 @@
     },
     "grow": {
       "hp": 10.33,
-      "atk": 2.3,
+      "atk": 2.30,
       "def": 1.44,
       "agi": 1.33
     },
@@ -7383,7 +7383,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_ir2QAvIE_5fbaf3d324f02f6cdb07ff79500a10046c23a171.gif"
   },
-  {
+      {
     "name": "흑기린",
     "searchable": true,
     "grade": "일반",
@@ -7409,7 +7409,7 @@
     "mount": true,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_S4Mlf6eY_daa8b60bbabad644c30d61f04476e0f145d5c9d1.gif"
   },
-  {
+      {
     "name": "테르가",
     "searchable": true,
     "grade": "상급",
@@ -7435,7 +7435,7 @@
     "mount": true,
     "img": "https://stoneage001.com/data/file/board23/157bf01a1746a3749294bca554ba4c34_tLiNdbBC_07bcf62486c61a34b1323f1d6d58444dafb856f3.gif"
   },
-  {
+      {
     "name": "테이노스",
     "searchable": true,
     "grade": "상급",
@@ -7455,13 +7455,13 @@
       "hp": 11.11,
       "atk": 2.36,
       "def": 1.46,
-      "agi": 1.2
+      "agi": 1.20
     },
     "route": "금빛 상자 랜덤 페트",
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_zN7InWc1_8f35bddcf2484230887c07113a789d23a64df71d.gif"
   },
-  {
+      {
     "name": "테이토스",
     "searchable": true,
     "grade": "상급",
@@ -7487,7 +7487,7 @@
     "mount": true,
     "img": "https://stoneage001.com/data/file/board23/157bf01a1746a3749294bca554ba4c34_RZLw6uTB_079888658b7c79f83f0e43194b33ed469843f789.gif"
   },
-  {
+      {
     "name": "젖소",
     "searchable": true,
     "grade": "일반",
@@ -7505,15 +7505,15 @@
     },
     "grow": {
       "hp": 10.43,
-      "atk": 2.2,
+      "atk": 2.20,
       "def": 1.39,
-      "agi": 1.4
+      "agi": 1.40
     },
     "route": "한가위 이벤트 한정 포획",
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_0uWDsF9g_c07194b77dd7b7028a18066fcb657808c407850f.gif"
   },
-  {
+      {
     "name": "화우",
     "searchable": true,
     "grade": "일반",
@@ -7539,7 +7539,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_2lB5yzuD_7118d9d1ddc61be91d49b3d27623ae7d2117cfb9.gif"
   },
-  {
+      {
     "name": "하누",
     "searchable": true,
     "grade": "일반",
@@ -7565,7 +7565,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_vPqzlu78_82a4199bfdc4bfc32e5f8018965f67d8a450003a.gif"
   },
-  {
+      {
     "name": "흑우",
     "searchable": true,
     "grade": "일반",
@@ -7585,13 +7585,13 @@
       "hp": 10.31,
       "atk": 2.25,
       "def": 1.39,
-      "agi": 1.3
+      "agi": 1.30
     },
     "route": "한가위 이벤트 한정 포획",
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_3TndFzPY_e39a6b349cc08ee7e4ef57217bb3daaf2ac7a0d9.gif"
   },
-  {
+      {
     "name": "하트링",
     "searchable": true,
     "grade": "일반",
@@ -7609,7 +7609,7 @@
     },
     "grow": {
       "hp": 10.24,
-      "atk": 2.1,
+      "atk": 2.10,
       "def": 1.24,
       "agi": 1.64
     },
@@ -7617,7 +7617,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_Z6kptRxC_89e7a8908ceafad6238def3d31ba0eb5fda2c1ca.gif"
   },
-  {
+      {
     "name": "초코링",
     "searchable": true,
     "grade": "일반",
@@ -7643,7 +7643,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_jGgqyOsV_6c7d15c4da3a72dce009e14c56a0e0b011c832cc.gif"
   },
-  {
+      {
     "name": "한복메이",
     "searchable": true,
     "grade": "일반",
@@ -7669,7 +7669,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_Qw05PCSk_bed832f36022bbbfb607b743f469538316aaa872.gif"
   },
-  {
+      {
     "name": "한복밍코",
     "searchable": true,
     "grade": "일반",
@@ -7686,7 +7686,7 @@
       "agi": 9.49
     },
     "grow": {
-      "hp": 9.9,
+      "hp": 9.90,
       "atk": 2.11,
       "def": 1.29,
       "agi": 1.66
@@ -7695,7 +7695,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_YJy6HWgi_39e0629ed147e3a28d4427f4e8f8b38cf1c04021.gif"
   },
-  {
+      {
     "name": "핑코",
     "searchable": true,
     "grade": "일반",
@@ -7721,7 +7721,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_xPjSlqvn_78745ad0afaf9a80630032035b23579d8cbd1f4a.gif"
   },
-  {
+      {
     "name": "토룡",
     "searchable": true,
     "grade": "일반",
@@ -7747,7 +7747,7 @@
     "mount": true,
     "img": "https://stoneage001.com/data/file/board23/157bf01a1746a3749294bca554ba4c34_OvhHinza_26ba5c56b6f8c636fe5d3493e7e21f89b5da3ec8.gif"
   },
-  {
+      {
     "name": "도철",
     "searchable": true,
     "grade": "일반",
@@ -7765,7 +7765,7 @@
     },
     "grow": {
       "hp": 10.46,
-      "atk": 2.3,
+      "atk": 2.30,
       "def": 1.48,
       "agi": 1.24
     },
@@ -7773,7 +7773,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_YwNvg7Rq_9b8237502f79db3d7569e2f924d999b9226925df.gif"
   },
-  {
+      {
     "name": "고로",
     "searchable": true,
     "grade": "일반",
@@ -7792,14 +7792,14 @@
     "grow": {
       "hp": 11.94,
       "atk": 2.12,
-      "def": 2.2,
-      "agi": 0.5
+      "def": 2.20,
+      "agi": 0.50
     },
     "route": "금빛 상자 랜덤 페트",
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_7FtiN4gY_f06337f849a47187d1caa6e0cf2629c44ebb3ccb.gif"
   },
-  {
+      {
     "name": "가스트",
     "searchable": true,
     "grade": "일반",
@@ -7816,7 +7816,7 @@
       "agi": 7.56
     },
     "grow": {
-      "hp": 9.9,
+      "hp": 9.90,
       "atk": 2.29,
       "def": 1.47,
       "agi": 1.37
@@ -7825,7 +7825,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_Ha1BX3D8_3ef546653063eb346b21184c80216d1027b31cce.gif"
   },
-  {
+      {
     "name": "해태",
     "searchable": true,
     "grade": "일반",
@@ -7851,7 +7851,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_KRnB6lME_981cb45c9e3a1a8613d337662a3ec87127e8aeaa.gif"
   },
-  {
+      {
     "name": "키로",
     "searchable": true,
     "grade": "일반",
@@ -7877,7 +7877,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_8EVBd4YP_e75bf6ca917af1d60bc12d603d63c669f4e2f687.gif"
   },
-  {
+      {
     "name": "로코",
     "searchable": true,
     "grade": "일반",
@@ -7903,7 +7903,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_WloDJ3Bj_558012dd85fb263e51c32c71fc31705a5ad3e254.gif"
   },
-  {
+      {
     "name": "테라탄",
     "searchable": true,
     "grade": "일반",
@@ -7929,7 +7929,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_WYvPoyOI_3310b86625b8415d1e6591db6aea0102d9eff1f3.gif"
   },
-  {
+      {
     "name": "게이블",
     "searchable": true,
     "grade": "일반",
@@ -7955,7 +7955,7 @@
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/1edfce9ea2ad6b672e8453ca35a782f3_Q9Cwp6Tn_b5e7e8a6e3a4e8a9c072aedc95f06ac7e9185fe5.gif"
   },
-  {
+      {
     "name": "해치",
     "searchable": true,
     "grade": "일반",
