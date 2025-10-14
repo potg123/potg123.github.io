@@ -634,27 +634,69 @@ $("btnNew").addEventListener("click", ()=>{
 });
 searchEl.addEventListener("input", renderList);
 
-// [버튼] S0/SG로 k/u 추정
-$("btnSolve").addEventListener("click", ()=>{
+// [버튼] S0/SG로 k/u 추정 (자동 근사추정 지원)
+$("btnSolve").addEventListener("click", async () => {
   const f = gatherForm();
-  if(!f || !f.name){ alert("이름을 입력하세요."); return; }
-  if([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi].some(v=>v==null) ||
-     [f.sg.hp,f.sg.atk,f.sg.def,f.sg.agi].some(v=>v==null)){
-    alert("S0/SG를 모두 채워 주세요."); return;
+  if (!f || !f.name) {
+    alert("이름을 입력하세요.");
+    return;
   }
-  const sol = inferKU_STRICT([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi], f.sg);
-  if(!sol){ alert("계산할 수 없는 값입니다(STRICT 해 없음)."); return; }
 
-  // 자동 기입 = 짜얄 u
-  $("ku_k").value   = sol.k;
-  $("ku_hp").value  = sol.u.hp;
+  // 유효성 검사
+  if (
+    [f.s0.hp, f.s0.atk, f.s0.def, f.s0.agi].some(v => v == null) ||
+    [f.sg.hp, f.sg.atk, f.sg.def, f.sg.agi].some(v => v == null)
+  ) {
+    alert("S0/SG를 모두 채워 주세요.");
+    return;
+  }
+
+  // 1차 시도: STRICT 모드 계산
+  let sol = inferKU_STRICT(
+    [f.s0.hp, f.s0.atk, f.s0.def, f.s0.agi],
+    f.sg
+  );
+
+  // 실패 시: Relaxed 근사추정 자동 전환
+  if (!sol) {
+    console.warn("STRICT 해 없음 → Relaxed 근사추정으로 전환합니다...");
+
+    // inferKU_Relaxed 함수가 tolerance를 허용한다고 가정
+    // (tolK: k값 변동 허용, tolStat: 스탯 편차 허용)
+    sol = inferKU_Relaxed(
+      [f.s0.hp, f.s0.atk, f.s0.def, f.s0.agi],
+      f.sg,
+      {
+        tolK: 2,         // k ±2 정도 허용
+        tolStat: 0.15,   // ±15% 편차 허용
+        verbose: true    // 콘솔에 세부 로그 출력
+      }
+    );
+
+    if (sol) {
+      sol.ku_override = true;
+      console.log("Relaxed 추정 성공:", sol);
+    } else {
+      alert("근사추정 실패: STRICT 및 Relaxed 모두 해 없음");
+      return;
+    }
+  }
+
+  // 결과 자동 반영
+  $("ku_k").value = sol.k;
+  $("ku_hp").value = sol.u.hp;
   $("ku_atk").value = sol.u.atk;
   $("ku_def").value = sol.u.def;
   $("ku_agi").value = sol.u.agi;
   $("ovr_check").checked = true;
 
   updateConsistency();
-  alert(`추정 완료: k=${sol.k}, u=(${sol.u.hp},${sol.u.atk},${sol.u.def},${sol.u.agi})`);
+
+  alert(
+    `추정 완료: k=${sol.k}, u=(${sol.u.hp}, ${sol.u.atk}, ${sol.u.def}, ${sol.u.agi})${
+      sol.ku_override ? " (근사추정)" : ""
+    }`
+  );
 });
 
 
