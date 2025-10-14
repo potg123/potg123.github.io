@@ -531,13 +531,9 @@ function petCard(p) {
 }
 
 function sortRows(rows, f) {
-  const key = f.attrPick;
-  if (!key || key === "전체" || key === "듀얼") return rows;
-  const getv = (p) => (p.attr && typeof p.attr[key] === "number") ? p.attr[key] : 0;
-  return rows.slice().sort((a,b)=> {
-    const dv = getv(b) - getv(a);
-    if (dv !== 0) return dv;
-    return (a.name||"").localeCompare(b.name||"");
+  // 항상 이름 가나다순으로 정렬
+  return rows.slice().sort((a, b) => {
+    return (a.name || "").localeCompare(b.name || "");
   });
 }
 
