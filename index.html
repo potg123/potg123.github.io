@@ -80,14 +80,6 @@
   .tag.rank8{border-color:#2b4a82; background:#0d1a33; color:#88b5ff}
   .kpis{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
   .right{display:flex;gap:8px;align-items:center}
-    /* === 상단바 반응형 정돈 === */
-  .topbar{
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-  }
-  .topbar .title{min-width:0}
-  .topbar-actions{
-    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
-  }
 
   @media (max-width: 720px){ .kpis{grid-template-columns: 1fr} }
   .kpi{ display:flex; gap:14px; align-items:center; border:1px solid #2a3040; border-radius:14px; padding:14px; background:radial-gradient(120px 120px at 20% -10%, #11224444, transparent); }
@@ -109,7 +101,6 @@
 <body>
 <header>
     <!-- 상단바: 반응형 -->
-      <div class="topbar">
         <div class="title">
           <h1>노바서버 페트 계산기</h1>
           <div class="muted">패치노트 v2.0 적용</div>
@@ -119,7 +110,7 @@
           <a class="btn ghost" id="btnDict" href="./petsfilter.html">페트 사전</a>
           <button class="btn ghost" id="btnAdmin">Admin</button>
         </div>
-      </div>
+
 </header>
 
 <div class="grid">
