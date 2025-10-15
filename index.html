@@ -78,13 +78,20 @@
   .tag.warn{border-color:#7a5b0e; background:#241a05; color:#ffb300}
   .tag.rank8{border-color:#2b4a82; background:#0d1a33; color:#88b5ff}
   .kpis{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
-    /* === 상단바 반응형 정돈 === */
+  /* === 상단바 반응형 정돈 === */
   .topbar{
     display:flex; align-items:center; justify-content:space-between; gap:12px;
   }
   .topbar .title{min-width:0}
   .topbar-actions{
     display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+  @media (max-width: 760px){
+    .topbar{flex-wrap:wrap}
+    .topbar .title{flex: 1 0 100%}
+    .topbar-actions{flex: 1 0 100%; justify-content:flex-start; gap:8px}
+    #adminToolbar{order:1; width:100%; display:none;}
+    .backBtn, .adminLogin{order:2;}
   }
   @media (max-width: 720px){ .kpis{grid-template-columns: 1fr} }
   .kpi{ display:flex; gap:14px; align-items:center; border:1px solid #2a3040; border-radius:14px; padding:14px; background:radial-gradient(120px 120px at 20% -10%, #11224444, transparent); }
