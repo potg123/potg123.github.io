@@ -86,13 +86,7 @@
   .topbar-actions{
     display:flex; align-items:center; gap:8px; flex-wrap:wrap;
   }
-  @media (max-width: 760px){
-    .topbar{flex-wrap:wrap}
-    .topbar .title{flex: 1 0 100%}
-    .topbar-actions{flex: 1 0 100%; justify-content:flex-start; gap:8px}
-    #adminToolbar{order:1; width:100%; display:none;}
-    .backBtn, .adminLogin{order:2;}
-  }
+
   @media (max-width: 720px){ .kpis{grid-template-columns: 1fr} }
   .kpi{ display:flex; gap:14px; align-items:center; border:1px solid #2a3040; border-radius:14px; padding:14px; background:radial-gradient(120px 120px at 20% -10%, #11224444, transparent); }
   .ring{width:60px; height:60px; border-radius:50%; background:conic-gradient(var(--accent) 0deg, var(--accent) var(--p,0deg), var(--ring) var(--p,0deg)); display:grid; place-items:center}
@@ -116,7 +110,7 @@
   <div class="brand">노바서버 페트 계산기</div>
   <div class="ver">
     <span>패치노트 v2.0 적용</span>
-        <a class="btn ghost" id="btnDict" href="./petsfilter.html">노바서버 페트사전</a>
+        <a class="btn ghost" id="btnDict" href="./petsfilter.html">페트 사전</a>
     <button class="btn ghost" id="btnAdmin">Admin</button>
   </div>
   </div>
