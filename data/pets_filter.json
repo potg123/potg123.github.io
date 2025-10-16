@@ -1466,10 +1466,10 @@
       "풍": 0
     },
     "init": {
-      "hp": 45,
-      "atk": 9,
-      "def": 6,
-      "agi": 7
+      "hp": 45.88,
+      "atk": 9.17,
+      "def": 6.07,
+      "agi": 7.71
     },
     "grow": {
       "hp": 9.88,
@@ -1492,10 +1492,10 @@
       "풍": 0
     },
     "init": {
-      "hp": 49,
-      "atk": 9,
-      "def": 5,
-      "agi": 7
+      "hp": 49.1,
+      "atk": 9.69,
+      "def": 5.96,
+      "agi": 7.93
     },
     "grow": {
       "hp": 10.14,
@@ -1596,10 +1596,10 @@
       "풍": 0
     },
     "init": {
-      "hp": 51,
-      "atk": 7,
-      "def": 8,
-      "agi": 6
+      "hp": 51.41,
+      "atk": 7.93,
+      "def": 8.96,
+      "agi": 6.33
     },
     "grow": {
       "hp": 10.62,
@@ -4210,32 +4210,6 @@
     "route": "사이너스 섬 (동382, 남479) 포획",
     "mount": false,
     "img": "https://stoneage001.com/data/file/board23/69a4a14b3f4c5839b7292aef0c8409f6_i9YJKMrz_221a7e38d7c89056d1ee581b9cac43377972b4fa.gif"
-  },
-  {
-    "name": "타르노로스",
-    "searchable": true,
-    "grade": "일반",
-    "attr": {
-      "지": 0,
-      "수": 7,
-      "화": 3,
-      "풍": 0
-    },
-    "init": {
-      "hp": 62.22,
-      "atk": 10.17,
-      "def": 8.72,
-      "agi": 6.55
-    },
-    "grow": {
-      "hp": 11.77,
-      "atk": 1.92,
-      "def": 1.65,
-      "agi": 1.24
-    },
-    "route": "칠흑의 동굴 19층 (동34, 남25) 포획",
-    "mount": false,
-    "img": "https://stoneage001.com/data/file/board23/69a4a14b3f4c5839b7292aef0c8409f6_CsYOQ0Ir_f7f5631f386923923c45919aa4e5e3a6a513e359.gif"
   },
   {
     "name": "타르노로스",
