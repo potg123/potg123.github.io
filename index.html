@@ -9,7 +9,7 @@
 <style>
   /* 바디 레벨 플로팅 툴팁 */
   .floating-tip{
-    position: static; z-index: 9999; max-width: 360px;
+    position: fixed; z-index: 9999; max-width: 360px;
     background:#0b1320; color:#cfe1ff; border:1px solid #2b3a55;
     border-radius:10px; padding:8px 10px; font-size:12px; line-height:1.35;
     box-shadow:0 8px 24px rgba(0,0,0,.35);
@@ -42,7 +42,7 @@
   header{
     display:flex; align-items:center; justify-content:space-between;
     padding:16px 20px; border-bottom:1px solid #232a36; background:rgba(0,0,0,.2);
-    position:sticky; top:0; z-index:10;
+    position:static; top:auto; z-index:10;
   }
   h1{margin:0 0 6px; font-size:18px}
   .brand{font-weight:700; letter-spacing:.3px}
