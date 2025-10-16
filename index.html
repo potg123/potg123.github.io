@@ -799,7 +799,7 @@ return (x<=5) ? getCSS('--ok')
 : getCSS('--bad');
 }
 const { setFrac: _trSetFrac } = makeRing(trFill, null, ()=> colorByTries(currTries));
-let currTries = 0;
+let currTries = 1;
 function setTries(t){
 currTries = Math.max(1, Number(t)||1);
 let frac;
@@ -823,9 +823,9 @@ kpiSuccess.textContent = "—%";
 kpiAppear .textContent = "—%";
 kpiTries .textContent = "—";
 // 링 리셋(크기·비율 유지)
-setSuccess(Infinity);
-setAppear(Infinity);
-setTries(Infinity);
+setSuccess(0);
+setAppear(0);
+setTries(0);
 // 부가정보 리셋
 
 totMatches.textContent = "—";
