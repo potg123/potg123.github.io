@@ -793,25 +793,30 @@ window.setAppear = setAppear;
 
 /* ===== 3) 기대값 — 200↑ 항상 100% + 색상(초/노/빨) ===== */
 const trFill = document.getElementById('trFill');
-function colorByTries(x){
-  return (x<=5)  ? getCSS('--ok')
-       : (x<=20) ? getCSS('--warn')
-       :           getCSS('--bad');
+let currTries = 1; // 먼저 선언해야 함
+
+function colorByTries(x) {
+  return (x < 50) ? getCSS('--ok')      // 초록
+       : (x < 100) ? getCSS('--warn')   // 노랑
+       : getCSS('--bad');               // 빨강
 }
-const { setFrac: _trSetFrac } = makeRing(trFill, null, ()=> colorByTries(currTries));
-let currTries = 1;
-function setTries(t){
-  currTries = Math.max(1, Number(t)||1);
+
+const { setFrac: _trSetFrac } = makeRing(trFill, null, () => colorByTries(currTries));
+
+function setTries(t) {
+  currTries = Math.max(1, Number(t) || 1);
+
   let frac;
-  if(currTries>=200) frac=1;
-  else{
-    const r = (Math.log10(currTries)-Math.log10(1)) / (Math.log10(200)-Math.log10(1));
-    frac = Math.max(0, Math.min(1, r));
-  }
+  if (currTries >= 200) frac = 1;
+  else frac = currTries / 200; // 선형 비율
+
   trFill.style.stroke = colorByTries(currTries);
   _trSetFrac(frac);
-  document.getElementById('kpiTries').textContent = (Number.isFinite(t)? Math.round(currTries) : '—');
+
+  document.getElementById('kpiTries').textContent =
+    (Number.isFinite(t) ? Math.round(currTries) : '—');
 }
+
 window.setTries = setTries;
 /* ===== KPI 렌더 교체 =====
 */
