@@ -793,7 +793,7 @@ window.setAppear = setAppear;
 
 /* ===== 3) 기대값 — 200↑ 항상 100% + 색상(초/노/빨) ===== */
 const trFill = document.getElementById('trFill');
-let currTries = 1; // 먼저 선언해야 함
+let currTries = 0; // 먼저 선언해야 함
 
 function colorByTries(x) {
   return (x < 50) ? getCSS('--ok')      // 초록
