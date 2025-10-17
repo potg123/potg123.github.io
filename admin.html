@@ -639,20 +639,22 @@ searchEl.addEventListener("input", renderList);
 // [버튼] S0/SG로 k/u 추정
 $("btnSolve").addEventListener("click", ()=>{
   const f = gatherForm();
-  if(!f || !f.name){ alert("이름을 입력하세요."); return; }
+  if(!f.name){ alert("이름을 입력하세요."); return; }
   if([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi].some(v=>v==null) ||
      [f.sg.hp,f.sg.atk,f.sg.def,f.sg.agi].some(v=>v==null)){
     alert("S0/SG를 모두 채워 주세요."); return;
   }
-  const sol = inferKU_STRICT([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi], f.sg);
-  // STRICT 실패 시: 체력(S0.hp)이 정수이면 약간 내림 재시도
+
+  let sol = inferKU_STRICT([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi], f.sg);
+
+  // 💡 STRICT 실패 시: 체력(S0.hp)이 정수이면 약간 내림 재시도
   if(!sol && Number.isInteger(f.s0.hp)){
     sol = inferKU_STRICT([f.s0.hp - 0.01, f.s0.atk, f.s0.def, f.s0.agi], f.sg);
     if(sol) console.log(`[auto-fix] HP ${f.s0.hp} → ${f.s0.hp - 0.01} 로 보정하여 해 탐색 성공`);
   }
-  // if(!sol){ alert("계산할 수 없는 값입니다(STRICT 해 없음)."); return; }
 
-  // 자동 기입 = 짜얄 u
+  if(!sol){ alert("계산할 수 없는 값입니다(STRICT 해 없음)."); return; }
+
   $("ku_k").value   = sol.k;
   $("ku_hp").value  = sol.u.hp;
   $("ku_atk").value = sol.u.atk;
