@@ -325,12 +325,12 @@ function toFixed2(x){ return new Decimal(x).toDecimalPlaces(2, Decimal.ROUND_HAL
 /* ====== 추정/검증 로직 ====== */
 const ESET = Array.from({ length: ((575 - 435) / 5) + 1 }, (_, i) => 575 - i*5);
 
-function s0_from_k_u_jjyal(k,uEff){ // uEff = (짜얄 u)+2
+function s0_from_k_u_jjyal(k, u){
   const fac = k/100;
-  const vhp  = (uEff.hp + 2.5) * fac;
-  const vatk = (uEff.atk+ 2.5) * fac;
-  const vdef = (uEff.def+ 2.5) * fac;
-  const vagi = (uEff.agi+ 2.5) * fac;
+  const vhp  = (u.hp + 2.5) * fac;
+  const vatk = (u.atk+ 2.5) * fac;
+  const vdef = (u.def+ 2.5) * fac;
+  const vagi = (u.agi+ 2.5) * fac;
   const s_hp = Math.floor(vhp*4 + vatk + vdef + vagi);
   const s_atk= Math.floor(vhp*0.1 + vatk + vdef*0.1 + vagi*0.05);
   const s_def= Math.floor(vhp*0.1 + vatk*0.1 + vdef + vagi*0.05);
@@ -346,12 +346,10 @@ function solveUFromSG_STRICT(SG,e){
     const eD = new Decimal(e);
     const f  = eD.dividedBy(10000);
 
-    // u_eff.agi = round( SG.agi*10000/e - 2.5 )
-    const d  = new Decimal(SG.agi).times(10000).dividedBy(eD).minus(2.5);
-    const u_agi = d.round();
-
+    // u.agi = round(SG.agi*10000/e - 2.5)
+    const u_agi = new Decimal(SG.agi).times(10000).dividedBy(eD).minus(2.5).round();
     const dPlus25 = u_agi.plus(2.5);
-    // 선형계 풀기 (변수는 모두 u_eff)
+
     const rhs1 = new Decimal(SG.hp).minus( dPlus25.times(f) ).dividedBy(f);
     const rhs2 = new Decimal(SG.atk).minus( dPlus25.times(f).times(0.05) ).dividedBy(f);
     const rhs3 = new Decimal(SG.def).minus( dPlus25.times(f).times(0.05) ).dividedBy(f);
@@ -375,12 +373,12 @@ function solveUFromSG_STRICT(SG,e){
     }
     const aPrime=A[0][3], bPrime=A[1][3], cPrime=A[2][3];
 
-    // 엔진용 u_eff (짜얄 u + 2)
+    // ✅ 원래 u (JJYAL)
     const u_hp  = aPrime.minus(2.5).round();
     const u_atk = bPrime.minus(2.5).round();
     const u_def = cPrime.minus(2.5).round();
 
-    // === SG 반올림 일치 엄격 검증 (u_eff 기준) ===
+    // SG 반올림 검증(원래 u 기준)
     const r2 = x => new Decimal(x).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
     const hp_chk  = r2( f.times( u_hp.plus(2.5).times(4).plus(u_atk.plus(2.5)).plus(u_def.plus(2.5)).plus(u_agi.plus(2.5)) ) );
     const atk_chk = r2( f.times( u_hp.plus(2.5).times(0.1).plus(u_atk.plus(2.5)).plus(u_def.plus(2.5).times(0.1)).plus(u_agi.plus(2.5).times(0.05)) ) );
@@ -390,7 +388,7 @@ function solveUFromSG_STRICT(SG,e){
     const ok = hp_chk.eq(r2(SG.hp)) && atk_chk.eq(r2(SG.atk)) && def_chk.eq(r2(SG.def)) && agi_chk.eq(r2(SG.agi));
     if(!ok) return null;
 
-    return { u_eff:{hp:+u_hp, atk:+u_atk, def:+u_def, agi:+u_agi}, e:+e };
+    return { u:{hp:+u_hp, atk:+u_atk, def:+u_def, agi:+u_agi}, e:+e };
   }catch{ return null; }
 }
 
@@ -400,17 +398,9 @@ function inferKU_STRICT(S0, SG){
     const sol = solveUFromSG_STRICT(SG, e);
     if(!sol) continue;
     for(let k=10;k<=100;k++){
-      // S0 일치 검사는 u_eff로
-      const s = s0_from_k_u_jjyal(k, sol.u_eff);
+      const s = s0_from_k_u_jjyal(k, sol.u); // ✅ 원래 u 사용
       if(s[0]===S0int[0] && s[1]===S0int[1] && s[2]===S0int[2] && s[3]===S0int[3]){
-        // UI/저장용: 짜얄 u = u_eff - 2
-        const u = {
-          hp: sol.u_eff.hp - 2,
-          atk: sol.u_eff.atk - 2,
-          def: sol.u_eff.def - 2,
-          agi: sol.u_eff.agi - 2,
-        };
-        return {k:Math.round(k), u, e:sol.e};
+        return {k:Math.round(k), u:sol.u, e:sol.e}; // ✅ 더 이상 -2 보정 없음
       }
     }
   }
@@ -419,10 +409,9 @@ function inferKU_STRICT(S0, SG){
 
 
 /* ====== R8 집계 엔진 ====== */
-function collectR8ObsForKU(k,u){ // u는 짜얄
+function collectR8ObsForKU(k,u){ // u = 원래 u (JJYAL)
   Decimal.set({ precision:30, rounding: Decimal.ROUND_HALF_UP });
   const fac = new Decimal(k).dividedBy(100);
-  const uEff = { hp:u.hp+2, atk:u.atk+2, def:u.def+2, agi:u.agi+2 };
 
   const seen = new Map();
 
@@ -436,10 +425,11 @@ function collectR8ObsForKU(k,u){ // u는 짜얄
                 const hb = 10 - ab - db - gb;
                 if(hb < 0 || hb > 10) continue;
 
-                const baseA = new Decimal(uEff.atk + ar + ab);
-                const baseD = new Decimal(uEff.def + dr + db);
-                const baseG = new Decimal(uEff.agi + gr + gb);
-                const baseH = new Decimal(uEff.hp  + hr + hb);
+                // ✅ 원래 u 그대로 사용
+                const baseA = new Decimal(u.atk + ar + ab);
+                const baseD = new Decimal(u.def + dr + db);
+                const baseG = new Decimal(u.agi + gr + gb);
+                const baseH = new Decimal(u.hp  + hr + hb);
 
                 const iA = baseA.times(fac);
                 const iD = baseD.times(fac);
@@ -570,25 +560,22 @@ function updateConsistency(){
 
   if(!ready){ box.innerHTML = ""; return; }
 
-  // 일관성 표시는 u_eff 기준으로 계산
-  const uEff = { hp:f.u.hp+2, atk:f.u.atk+2, def:f.u.def+2, agi:f.u.agi+2 };
-
-  // S0 정수 비교
-  const sPred = s0_from_k_u_jjyal(f.k, uEff);
-  const sInt  = floor4([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi]);
+  // ✅ S0 정수 비교: 원래 u 기준
+  const sPred = s0_from_k_u_jjyal(f.k, f.u);
+  const sInt  = [f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi].map(v=>Math.floor(v));
   const okS0  = (sPred[0]===sInt[0] && sPred[1]===sInt[1] && sPred[2]===sInt[2] && sPred[3]===sInt[3]);
 
   try{
     Decimal.set({ precision:50, rounding: Decimal.ROUND_HALF_UP });
 
-    // SG 참고 e (u_eff 기준)
-    const e = new Decimal(f.sg.agi).times(10000).dividedBy(new Decimal(uEff.agi).plus(2.5));
+    // ✅ SG 참고 e: 원래 u 기준
+    const e = new Decimal(f.sg.agi).times(10000).dividedBy(new Decimal(f.u.agi).plus(2.5));
     const fct = e.dividedBy(10000);
     const r2  = x => new Decimal(x).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 
-    const hpC  = r2( fct.times( (uEff.hp+2.5)*4 + (uEff.atk+2.5) + (uEff.def+2.5) + (uEff.agi+2.5) ) ).toNumber();
-    const atkC = r2( fct.times( (uEff.hp+2.5)*0.1 + (uEff.atk+2.5) + (uEff.def+2.5)*0.1 + (uEff.agi+2.5)*0.05 ) ).toNumber();
-    const defC = r2( fct.times( (uEff.hp+2.5)*0.1 + (uEff.atk+2.5)*0.1 + (uEff.def+2.5) + (uEff.agi+2.5)*0.05 ) ).toNumber();
+    const hpC  = r2( fct.times( (f.u.hp+2.5)*4 + (f.u.atk+2.5) + (f.u.def+2.5) + (f.u.agi+2.5) ) ).toNumber();
+    const atkC = r2( fct.times( (f.u.hp+2.5)*0.1 + (f.u.atk+2.5) + (f.u.def+2.5)*0.1 + (f.u.agi+2.5)*0.05 ) ).toNumber();
+    const defC = r2( fct.times( (f.u.hp+2.5)*0.1 + (f.u.atk+2.5)*0.1 + (f.u.def+2.5) + (f.u.agi+2.5)*0.05 ) ).toNumber();
 
     const hpDiff  = toFixed2(hpC  - f.sg.hp);
     const atkDiff = toFixed2(atkC - f.sg.atk);
@@ -639,22 +626,15 @@ searchEl.addEventListener("input", renderList);
 // [버튼] S0/SG로 k/u 추정
 $("btnSolve").addEventListener("click", ()=>{
   const f = gatherForm();
-  if(!f.name){ alert("이름을 입력하세요."); return; }
+  if(!f || !f.name){ alert("이름을 입력하세요."); return; }
   if([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi].some(v=>v==null) ||
      [f.sg.hp,f.sg.atk,f.sg.def,f.sg.agi].some(v=>v==null)){
     alert("S0/SG를 모두 채워 주세요."); return;
   }
-
-  let sol = inferKU_STRICT([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi], f.sg);
-
-  // 💡 STRICT 실패 시: 체력(S0.hp)이 정수이면 약간 내림 재시도
-  if(!sol && Number.isInteger(f.s0.hp)){
-    sol = inferKU_STRICT([f.s0.hp - 0.01, f.s0.atk, f.s0.def, f.s0.agi], f.sg);
-    if(sol) alert(`[auto-fix] HP ${f.s0.hp} → ${f.s0.hp - 0.01} 로 보정하여 해 탐색 성공`);
-  }
-
+  const sol = inferKU_STRICT([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi], f.sg);
   if(!sol){ alert("계산할 수 없는 값입니다(STRICT 해 없음)."); return; }
 
+  // 자동 기입 = 짜얄 u
   $("ku_k").value   = sol.k;
   $("ku_hp").value  = sol.u.hp;
   $("ku_atk").value = sol.u.atk;
