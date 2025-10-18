@@ -594,16 +594,31 @@ petSearch.addEventListener('input', renderPetList);
 /* ========= 목록 ========= */
 function renderPetList(){
   const kw = (petSearch.value||"").trim();
-  const names = ALL_NAMES.length? ALL_NAMES : Object.keys(GLOBAL_TABLE);
+  const names = ALL_NAMES.length ? ALL_NAMES : Object.keys(GLOBAL_TABLE);
+
+  // 🔸 키워드도 없고, 초성도 선택 안 된 경우 → 목록 숨김
+  if (!kw && !currentChosung) {
+    petList.innerHTML = "";
+    const d = document.createElement('div');
+    d.className = 'muted';
+    d.style.padding = '10px';
+    d.textContent = "검색어를 입력하거나 초성을 선택하세요.";
+    petList.appendChild(d);
+    return;
+  }
+
+  // 🔸 검색 조건이 있으면 필터링 시작
   const list = names.filter(n=>{
-    const a = kw? n.includes(kw): true;
-    const b = currentChosung? getChosung(n).startsWith(currentChosung): true;
+    const a = kw ? n.includes(kw) : true;
+    const b = currentChosung ? getChosung(n).startsWith(currentChosung) : true;
     return a && b;
   });
 
   petList.innerHTML="";
   if(list.length===0){
-    const d=document.createElement('div'); d.className='item'; d.textContent='결과 없음';
+    const d=document.createElement('div');
+    d.className='item';
+    d.textContent='결과 없음';
     petList.appendChild(d);
     return;
   }
