@@ -291,6 +291,17 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 <script>
 /* ====== 설정 ====== */
+const UI_U_SHIFT = -2;
+// model(원래 u) -> view(표시용 u)
+function uModelToView(u){
+  if(!u) return null;
+  return { hp:u.hp + UI_U_SHIFT, atk:u.atk + UI_U_SHIFT, def:u.def + UI_U_SHIFT, agi:u.agi + UI_U_SHIFT };
+}
+// view(표시용 u) -> model(원래 u)
+function uViewToModel(u){
+  if(!u) return null;
+  return { hp:u.hp - UI_U_SHIFT, atk:u.atk - UI_U_SHIFT, def:u.def - UI_U_SHIFT, agi:u.agi - UI_U_SHIFT };
+}
 const GH_OWNER  = "potg123";
 const GH_REPO   = "potg123.github.io";
 const GH_BRANCH = "main";
@@ -495,6 +506,8 @@ function renderList(){
 function loadForm(name){
   CURRENT = name;
   const r = DB[name] || {};
+  const rawU = r?.u || null;                 // DB에 저장된 model(원래 u)
+  const viewU = rawU ? uModelToView(rawU) : null;
   $("name").value = name;
   $("note").value = r.note || "";
   $("s0_hp").value  = r?.s0?.hp  ?? "";
@@ -507,10 +520,10 @@ function loadForm(name){
   $("sg_agi").value = r?.sg?.agi ?? "";
   $("ovr_check").checked = !!r.ku_override;
   $("ku_k").value   = r?.k ?? "";
-  $("ku_hp").value  = r?.u?.hp  ?? "";
-  $("ku_atk").value = r?.u?.atk ?? "";
-  $("ku_def").value = r?.u?.def ?? "";
-  $("ku_agi").value = r?.u?.agi ?? "";
+  $("ku_hp").value  = viewU?.hp  ?? "";
+  $("ku_atk").value = viewU?.atk ?? "";
+  $("ku_def").value = viewU?.def ?? "";
+  $("ku_agi").value = viewU?.agi ?? "";
   updateConsistency();
   renderR8List();
 }
@@ -534,12 +547,13 @@ function gatherForm(){
   const ovr = $("ovr_check").checked;
 
   let k = num($("ku_k").value);
-  let u = {
+  let uView = {
     hp: num($("ku_hp").value),
     atk: num($("ku_atk").value),
     def: num($("ku_def").value),
     agi: num($("ku_agi").value)
   };
+  let u = uView && [uView.hp,uView.atk,uView.def,uView.agi].every(v=>v!=null) ? uViewToModel(uView) : null;
   if(!ovr){ k = null; u = null; }
 
   return { name, s0, sg, ovr, k, u, note: $("note").value.trim() };
@@ -642,15 +656,17 @@ $("btnSolve").addEventListener("click", ()=>{
 
   if(!sol){ alert("계산할 수 없는 값입니다(STRICT 해 없음)."); return; }
 
+  // sol.u 는 model(원래 u) — UI에는 view로 표시
+  const uView = uModelToView(sol.u);
   $("ku_k").value   = sol.k;
-  $("ku_hp").value  = sol.u.hp;
-  $("ku_atk").value = sol.u.atk;
-  $("ku_def").value = sol.u.def;
-  $("ku_agi").value = sol.u.agi;
+  $("ku_hp").value  = uView.hp;
+  $("ku_atk").value = uView.atk;
+  $("ku_def").value = uView.def;
+  $("ku_agi").value = uView.agi;
   $("ovr_check").checked = true;
 
   updateConsistency();
-  alert(`추정 완료: k=${sol.k}, u=(${sol.u.hp},${sol.u.atk},${sol.u.def},${sol.u.agi})`);
+  alert(`추정 완료: k=${sol.k}, u(view)=(${uView.hp},${uView.atk},${uView.def},${uView.agi})`);
 });
 
 
