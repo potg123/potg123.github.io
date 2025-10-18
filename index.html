@@ -882,20 +882,27 @@ distBox.innerHTML = html;
 
 /* ========= 관측치 편의 ========= */
 function enableWheelStep(el){
-el.addEventListener('wheel',(e)=>{
-if(document.activeElement!==el) return;
-e.preventDefault();
-const delta = e.deltaY<0? 1 : -1;
-const curr = parseInt(el.value||"0",10);
-el.value = String(curr + delta);
-}, {passive:false});
+  el.addEventListener('wheel',(e)=>{
+    if(document.activeElement!==el) return;
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 1 : -1;
+    let curr = parseInt(el.value || "0", 10);
+    curr += delta;
+    if (curr < 1) curr = 1;
+    if (curr > 100) curr = 100;
+    el.value = String(curr);
+  }, {passive:false});
 }
 [obsatk,obshp,obsdef,obsagi].forEach(enableWheelStep);
 document.addEventListener('click', (e)=>{
-const btn = e.target.closest('[data-delta][data-target]'); if(!btn) return;
-const id = btn.getAttribute('data-target'); const delta = parseInt(btn.getAttribute('data-delta'),10);
-const input=document.getElementById(id); if(!input) return;
-const curr=parseInt(input.value||"0",10); input.value=String(curr+delta);
+  const btn = e.target.closest('[data-delta][data-target]'); if(!btn) return;
+  const id = btn.getAttribute('data-target'); const delta = parseInt(btn.getAttribute('data-delta'),10);
+  const input=document.getElementById(id); if(!input) return;
+  let curr=parseInt(input.value||"0",10); 
+  curr += delta;
+  if (curr < 1) curr = 1;
+  if (curr > 100) curr = 100;
+  input.value = String(curr);
 });
 
 /* ========= k/u 추정 ========= */
@@ -1109,32 +1116,6 @@ intOnlyInputs.forEach(input => {
     if (num > 100) num = 100;
     input.value = num;
   });
-
-  // ④ 마우스 휠로 조정할 때 1~100 유지
-  input.addEventListener('wheel', (e) => {
-    if (document.activeElement !== input) return;
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 1 : -1;
-    let num = parseInt(input.value || '0', 10) + delta;
-    if (num < 1) num = 1;
-    if (num > 100) num = 100;
-    input.value = num;
-  }, { passive: false });
-});
-
-// ⑤ +1 / -1 버튼 클릭 시에도 1~100 제한
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-delta][data-target]');
-  if (!btn) return;
-  const id = btn.getAttribute('data-target');
-  const delta = parseInt(btn.getAttribute('data-delta'), 10);
-  const input = document.getElementById(id);
-  if (!input) return;
-  let num = parseInt(input.value || '0', 10) + delta;
-  if (num < 1) num = 1;
-  if (num > 100) num = 100;
-  input.value = num;
-});
   
 /* ========= 부팅 ========= */
 (async function init(){
