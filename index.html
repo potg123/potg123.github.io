@@ -1100,6 +1100,7 @@ showKpis(null);
 });
 btnClear.addEventListener('click', ()=>{
 petSearch.value=""; currentChosung="";
+renderChosungTokens();
 Array.from(chosungBar.children).forEach(el=>el.classList.remove('on'));
 petList.querySelectorAll('.item.selected').forEach(el=>el.classList.remove('selected'));
 selectedItemEl = null;
