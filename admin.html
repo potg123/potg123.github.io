@@ -22,7 +22,7 @@
   label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px 2px}
   input,textarea,select{
     width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a3040;
-    background:#0e1218; color:var(--text); outline:none; font-size:14px;
+    background:#0e1218; color:#e8ecf3; outline:none; font-size:14px;
   }
   textarea{min-height:84px; resize:vertical}
   .btn{padding:10px 12px;border-radius:10px;border:1px solid #334055;background:#142033;color:#cfe1ff;cursor:pointer;font-weight:600}
@@ -181,7 +181,7 @@
       </label>
       <button class="btn" id="btnSolve">S0/SG로 k/u 추정</button>
       <button class="btn warn" id="btnClearKU">오버라이드 해제</button>
-      <span class="note">추정은 STRICT 모드(해 없으면 오류)</span>
+      <span class="note">※ 아래 k/u는 <b>원래 u(JJYAL)</b> 기준으로 입력/저장/연산됩니다.</span>
     </div>
 
     <div class="row" style="margin-top:8px">
@@ -190,7 +190,7 @@
         <input id="ku_k" type="number" step="1" placeholder="예: 28" />
       </div>
       <div class="col">
-        <label>u (hp / atk / def / agi)</label>
+        <label>u (hp / atk / def / agi) — <span class="muted">원래 u</span></label>
         <div class="grid2">
           <input id="ku_hp"  type="number" step="1" placeholder="예: 31" />
           <input id="ku_atk" type="number" step="1" placeholder="예: 41" />
@@ -240,21 +240,10 @@ async function sha256Hex(text){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function getSess(){
-  try{ return JSON.parse(localStorage.getItem("nova_admin_ok")||"null"); }catch{ return null; }
-}
-function setSessPersistent(){
-  localStorage.setItem("nova_admin_ok", JSON.stringify({h:ADMIN_PASSWORD_HASH, t:Date.now()}));
-}
-function sessValid(){
-  const s = getSess();
-  return !!(s && s.h===ADMIN_PASSWORD_HASH && (Date.now()-s.t) < LOGIN_TTL_MS);
-}
-function unlock(){
-  document.body.classList.remove("locked");
-  const g = document.getElementById("gate");
-  if(g) g.remove();
-}
+function getSess(){ try{ return JSON.parse(sessionStorage.getItem("nova_admin_ok")||"null"); }catch{ return null; } }
+function setSess(){ sessionStorage.setItem("nova_admin_ok", JSON.stringify({h:ADMIN_PASSWORD_HASH, t:Date.now()})); }
+function sessValid(){ const s = getSess(); return !!(s && s.h===ADMIN_PASSWORD_HASH && (Date.now()-s.t) < LOGIN_TTL_MS); }
+function unlock(){ document.body.classList.remove("locked"); const g = document.getElementById("gate"); if(g) g.remove(); }
 
 document.addEventListener("DOMContentLoaded", ()=>{
   const pass = document.getElementById("gate_pass");
@@ -271,7 +260,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     try{
       const hex = await sha256Hex(p);
       if(hex === ADMIN_PASSWORD_HASH){
-        if(rem && rem.checked) setSessPersistent();  // sessionStorage -> localStorage
+        if(rem && rem.checked) setSess();
         unlock();
       }else{
         err.textContent = "비밀번호가 올바르지 않습니다.";
@@ -291,17 +280,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 <script>
 /* ====== 설정 ====== */
-const UI_U_SHIFT = -2;
-// model(원래 u) -> view(표시용 u)
-function uModelToView(u){
-  if(!u) return null;
-  return { hp:u.hp + UI_U_SHIFT, atk:u.atk + UI_U_SHIFT, def:u.def + UI_U_SHIFT, agi:u.agi + UI_U_SHIFT };
-}
-// view(표시용 u) -> model(원래 u)
-function uViewToModel(u){
-  if(!u) return null;
-  return { hp:u.hp - UI_U_SHIFT, atk:u.atk - UI_U_SHIFT, def:u.def - UI_U_SHIFT, agi:u.agi - UI_U_SHIFT };
-}
 const GH_OWNER  = "potg123";
 const GH_REPO   = "potg123.github.io";
 const GH_BRANCH = "main";
@@ -333,15 +311,16 @@ const num = (v)=> (v===""||v==null||isNaN(+v)) ? null : +v;
 const floor4 = (a)=> a.map(x=>Math.floor(x??NaN));
 function toFixed2(x){ return new Decimal(x).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toNumber(); }
 
-/* ====== 추정/검증 로직 ====== */
+/* ====== 추정/검증 로직 (원래 u용) ====== */
 const ESET = Array.from({ length: ((575 - 435) / 5) + 1 }, (_, i) => 575 - i*5);
 
+/* ★ S0: 원래 u를 넣으면 반드시 (u + 4.5)로 계산해야 함 */
 function s0_from_k_u_jjyal(k, u){
   const fac = k/100;
-  const vhp  = (u.hp + 2.5) * fac;
-  const vatk = (u.atk+ 2.5) * fac;
-  const vdef = (u.def+ 2.5) * fac;
-  const vagi = (u.agi+ 2.5) * fac;
+  const vhp  = (u.hp + 4.5) * fac;
+  const vatk = (u.atk+ 4.5) * fac;
+  const vdef = (u.def+ 4.5) * fac;
+  const vagi = (u.agi+ 4.5) * fac;
   const s_hp = Math.floor(vhp*4 + vatk + vdef + vagi);
   const s_atk= Math.floor(vhp*0.1 + vatk + vdef*0.1 + vagi*0.05);
   const s_def= Math.floor(vhp*0.1 + vatk*0.1 + vdef + vagi*0.05);
@@ -349,6 +328,7 @@ function s0_from_k_u_jjyal(k, u){
   return [s_hp,s_atk,s_def,s_agi];
 }
 
+/* ★ SG 역풀이: u.agi = round(SG.agi*10000/e - 4.5) */
 function solveUFromSG_STRICT(SG,e){
   try{
     if(!SG || ![SG.hp,SG.atk,SG.def,SG.agi].every(Number.isFinite)) return null;
@@ -357,19 +337,22 @@ function solveUFromSG_STRICT(SG,e){
     const eD = new Decimal(e);
     const f  = eD.dividedBy(10000);
 
-    // u.agi = round(SG.agi*10000/e - 2.5)
-    const u_agi = new Decimal(SG.agi).times(10000).dividedBy(eD).minus(2.5).round();
-    const dPlus25 = u_agi.plus(2.5);
+    const u_agi = new Decimal(SG.agi).times(10000).dividedBy(eD).minus(4.5).round();
+    const dPlus45 = u_agi.plus(4.5);
 
-    const rhs1 = new Decimal(SG.hp).minus( dPlus25.times(f) ).dividedBy(f);
-    const rhs2 = new Decimal(SG.atk).minus( dPlus25.times(f).times(0.05) ).dividedBy(f);
-    const rhs3 = new Decimal(SG.def).minus( dPlus25.times(f).times(0.05) ).dividedBy(f);
+    // (u.hp+4.5)*4 + (u.atk+4.5) + (u.def+4.5) + (u.agi+4.5)
+    const rhs1 = new Decimal(SG.hp).minus( dPlus45.times(f) ).dividedBy(f);
+    // (u.hp+4.5)*0.1 + (u.atk+4.5) + (u.def+4.5)*0.1 + (u.agi+4.5)*0.05
+    const rhs2 = new Decimal(SG.atk).minus( dPlus45.times(f).times(0.05) ).dividedBy(f);
+    // (u.hp+4.5)*0.1 + (u.atk+4.5)*0.1 + (u.def+4.5) + (u.agi+4.5)*0.05
+    const rhs3 = new Decimal(SG.def).minus( dPlus45.times(f).times(0.05) ).dividedBy(f);
 
     let A = [
       [ new Decimal(4),   new Decimal(1),   new Decimal(1),   rhs1 ],
       [ new Decimal(0.1), new Decimal(1),   new Decimal(0.1), rhs2 ],
       [ new Decimal(0.1), new Decimal(0.1), new Decimal(1),   rhs3 ],
     ];
+    // 가우스 소거
     for(let i=0;i<3;i++){
       let mr=i; let mv=A[i][i].abs();
       for(let j=i+1;j<3;j++){ const t=A[j][i].abs(); if(t.greaterThan(mv)){mr=j; mv=t;} }
@@ -384,17 +367,17 @@ function solveUFromSG_STRICT(SG,e){
     }
     const aPrime=A[0][3], bPrime=A[1][3], cPrime=A[2][3];
 
-    // ✅ 원래 u (JJYAL)
-    const u_hp  = aPrime.minus(2.5).round();
-    const u_atk = bPrime.minus(2.5).round();
-    const u_def = cPrime.minus(2.5).round();
+    // ★ unknown = (u + 4.5)였으므로 u = unknown - 4.5
+    const u_hp  = aPrime.minus(4.5).round();
+    const u_atk = bPrime.minus(4.5).round();
+    const u_def = cPrime.minus(4.5).round();
 
-    // SG 반올림 검증(원래 u 기준)
+    // SG 반올림 검증 (u + 4.5)
     const r2 = x => new Decimal(x).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
-    const hp_chk  = r2( f.times( u_hp.plus(2.5).times(4).plus(u_atk.plus(2.5)).plus(u_def.plus(2.5)).plus(u_agi.plus(2.5)) ) );
-    const atk_chk = r2( f.times( u_hp.plus(2.5).times(0.1).plus(u_atk.plus(2.5)).plus(u_def.plus(2.5).times(0.1)).plus(u_agi.plus(2.5).times(0.05)) ) );
-    const def_chk = r2( f.times( u_hp.plus(2.5).times(0.1).plus(u_atk.plus(2.5).times(0.1)).plus(u_def.plus(2.5)).plus(u_agi.plus(2.5).times(0.05)) ) );
-    const agi_chk = r2( f.times( u_agi.plus(2.5) ) );
+    const hp_chk  = r2( f.times( (u_hp.plus(4.5)).times(4).plus(u_atk.plus(4.5)).plus(u_def.plus(4.5)).plus(u_agi.plus(4.5)) ) );
+    const atk_chk = r2( f.times( (u_hp.plus(4.5)).times(0.1).plus(u_atk.plus(4.5)).plus(u_def.plus(4.5).times(0.1)).plus(u_agi.plus(4.5).times(0.05)) ) );
+    const def_chk = r2( f.times( (u_hp.plus(4.5)).times(0.1).plus(u_atk.plus(4.5).times(0.1)).plus(u_def.plus(4.5)).plus(u_agi.plus(4.5).times(0.05)) ) );
+    const agi_chk = r2( f.times( u_agi.plus(4.5) ) );
 
     const ok = hp_chk.eq(r2(SG.hp)) && atk_chk.eq(r2(SG.atk)) && def_chk.eq(r2(SG.def)) && agi_chk.eq(r2(SG.agi));
     if(!ok) return null;
@@ -409,21 +392,19 @@ function inferKU_STRICT(S0, SG){
     const sol = solveUFromSG_STRICT(SG, e);
     if(!sol) continue;
     for(let k=10;k<=100;k++){
-      const s = s0_from_k_u_jjyal(k, sol.u); // ✅ 원래 u 사용
+      const s = s0_from_k_u_jjyal(k, sol.u);
       if(s[0]===S0int[0] && s[1]===S0int[1] && s[2]===S0int[2] && s[3]===S0int[3]){
-        return {k:Math.round(k), u:sol.u, e:sol.e}; // ✅ 더 이상 -2 보정 없음
+        return {k:Math.round(k), u:sol.u, e:sol.e};
       }
     }
   }
   return null;
 }
 
-
-/* ====== R8 집계 엔진 ====== */
-function collectR8ObsForKU(k,u){ // u = 원래 u (JJYAL)
+/* ====== R8 집계 엔진 (원래 u 사용) ====== */
+function collectR8ObsForKU(k,u){
   Decimal.set({ precision:30, rounding: Decimal.ROUND_HALF_UP });
   const fac = new Decimal(k).dividedBy(100);
-
   const seen = new Map();
 
   for(let ar=-2; ar<=2; ar++){
@@ -436,7 +417,6 @@ function collectR8ObsForKU(k,u){ // u = 원래 u (JJYAL)
                 const hb = 10 - ab - db - gb;
                 if(hb < 0 || hb > 10) continue;
 
-                // ✅ 원래 u 그대로 사용
                 const baseA = new Decimal(u.atk + ar + ab);
                 const baseD = new Decimal(u.def + dr + db);
                 const baseG = new Decimal(u.agi + gr + gb);
@@ -473,7 +453,7 @@ function collectR8ObsForKU(k,u){ // u = 원래 u (JJYAL)
   return out;
 }
 
-/* ====== UI 렌더 ====== */
+/* ====== UI ====== */
 const listEl = $("list"), searchEl = $("search");
 
 function renderList(){
@@ -506,8 +486,6 @@ function renderList(){
 function loadForm(name){
   CURRENT = name;
   const r = DB[name] || {};
-  const rawU = r?.u || null;                 // DB에 저장된 model(원래 u)
-  const viewU = rawU ? uModelToView(rawU) : null;
   $("name").value = name;
   $("note").value = r.note || "";
   $("s0_hp").value  = r?.s0?.hp  ?? "";
@@ -520,10 +498,10 @@ function loadForm(name){
   $("sg_agi").value = r?.sg?.agi ?? "";
   $("ovr_check").checked = !!r.ku_override;
   $("ku_k").value   = r?.k ?? "";
-  $("ku_hp").value  = viewU?.hp  ?? "";
-  $("ku_atk").value = viewU?.atk ?? "";
-  $("ku_def").value = viewU?.def ?? "";
-  $("ku_agi").value = viewU?.agi ?? "";
+  $("ku_hp").value  = r?.u?.hp  ?? "";
+  $("ku_atk").value = r?.u?.atk ?? "";
+  $("ku_def").value = r?.u?.def ?? "";
+  $("ku_agi").value = r?.u?.agi ?? "";
   updateConsistency();
   renderR8List();
 }
@@ -547,13 +525,12 @@ function gatherForm(){
   const ovr = $("ovr_check").checked;
 
   let k = num($("ku_k").value);
-  let uView = {
+  let u = {
     hp: num($("ku_hp").value),
     atk: num($("ku_atk").value),
     def: num($("ku_def").value),
     agi: num($("ku_agi").value)
   };
-  let u = uView && [uView.hp,uView.atk,uView.def,uView.agi].every(v=>v!=null) ? uViewToModel(uView) : null;
   if(!ovr){ k = null; u = null; }
 
   return { name, s0, sg, ovr, k, u, note: $("note").value.trim() };
@@ -574,7 +551,7 @@ function updateConsistency(){
 
   if(!ready){ box.innerHTML = ""; return; }
 
-  // ✅ S0 정수 비교: 원래 u 기준
+  // S0 정수 비교 (u + 4.5)
   const sPred = s0_from_k_u_jjyal(f.k, f.u);
   const sInt  = [f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi].map(v=>Math.floor(v));
   const okS0  = (sPred[0]===sInt[0] && sPred[1]===sInt[1] && sPred[2]===sInt[2] && sPred[3]===sInt[3]);
@@ -582,14 +559,14 @@ function updateConsistency(){
   try{
     Decimal.set({ precision:50, rounding: Decimal.ROUND_HALF_UP });
 
-    // ✅ SG 참고 e: 원래 u 기준
-    const e = new Decimal(f.sg.agi).times(10000).dividedBy(new Decimal(f.u.agi).plus(2.5));
+    // SG 참고 e (u + 4.5)
+    const e = new Decimal(f.sg.agi).times(10000).dividedBy(new Decimal(f.u.agi).plus(4.5));
     const fct = e.dividedBy(10000);
     const r2  = x => new Decimal(x).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 
-    const hpC  = r2( fct.times( (f.u.hp+2.5)*4 + (f.u.atk+2.5) + (f.u.def+2.5) + (f.u.agi+2.5) ) ).toNumber();
-    const atkC = r2( fct.times( (f.u.hp+2.5)*0.1 + (f.u.atk+2.5) + (f.u.def+2.5)*0.1 + (f.u.agi+2.5)*0.05 ) ).toNumber();
-    const defC = r2( fct.times( (f.u.hp+2.5)*0.1 + (f.u.atk+2.5)*0.1 + (f.u.def+2.5) + (f.u.agi+2.5)*0.05 ) ).toNumber();
+    const hpC  = r2( fct.times( (f.u.hp+4.5)*4 + (f.u.atk+4.5) + (f.u.def+4.5) + (f.u.agi+4.5) ) ).toNumber();
+    const atkC = r2( fct.times( (f.u.hp+4.5)*0.1 + (f.u.atk+4.5) + (f.u.def+4.5)*0.1 + (f.u.agi+4.5)*0.05 ) ).toNumber();
+    const defC = r2( fct.times( (f.u.hp+4.5)*0.1 + (f.u.atk+4.5)*0.1 + (f.u.def+4.5) + (f.u.agi+4.5)*0.05 ) ).toNumber();
 
     const hpDiff  = toFixed2(hpC  - f.sg.hp);
     const atkDiff = toFixed2(atkC - f.sg.atk);
@@ -612,7 +589,7 @@ function updateConsistency(){
         </div>
         <div class="${sgOk?'ok':'bad'}">SG 반올림 비교: <b>${sgOk?'OK':'차이 있음'}</b></div>
       </div>
-      <div class="note" style="margin-top:6px">※ 오버라이드는 저장 가능합니다. 불일치는 경고만 표시됩니다.</div>
+      <div class="note" style="margin-top:6px">※ k/u는 항상 <b>원래 u</b> 기준입니다.</div>
     `;
     box.classList.add(okS0 ? "ok" : "bad");
     box.style.display = "block";
@@ -623,7 +600,7 @@ function updateConsistency(){
   }
 }
 
-/* ====== 이벤트 바인딩 ====== */
+/* ====== 이벤트 ====== */
 $("btnReload").addEventListener("click", async ()=>{
   await loadRemote();
   alert("원격 데이터를 불러왔습니다.");
@@ -637,38 +614,33 @@ $("btnNew").addEventListener("click", ()=>{
 });
 searchEl.addEventListener("input", renderList);
 
-// [버튼] S0/SG로 k/u 추정
 $("btnSolve").addEventListener("click", ()=>{
   const f = gatherForm();
-  if(!f.name){ alert("이름을 입력하세요."); return; }
+  if(!f || !f.name){ alert("이름을 입력하세요."); return; }
   if([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi].some(v=>v==null) ||
      [f.sg.hp,f.sg.atk,f.sg.def,f.sg.agi].some(v=>v==null)){
     alert("S0/SG를 모두 채워 주세요."); return;
   }
-
   let sol = inferKU_STRICT([f.s0.hp,f.s0.atk,f.s0.def,f.s0.agi], f.sg);
 
   // 💡 STRICT 실패 시: 체력(S0.hp)이 정수이면 약간 내림 재시도
   if(!sol && Number.isInteger(f.s0.hp)){
     sol = inferKU_STRICT([f.s0.hp - 0.01, f.s0.atk, f.s0.def, f.s0.agi], f.sg);
-    if(sol) alert(`[auto-fix] HP ${f.s0.hp} → ${f.s0.hp - 0.01} 로 보정하여 해 탐색 성공`);
+    if(sol) console.log(`[auto-fix] HP ${f.s0.hp} → ${f.s0.hp - 0.01} 로 보정하여 해 탐색 성공`);
   }
 
   if(!sol){ alert("계산할 수 없는 값입니다(STRICT 해 없음)."); return; }
 
-  // sol.u 는 model(원래 u) — UI에는 view로 표시
-  const uView = uModelToView(sol.u);
   $("ku_k").value   = sol.k;
-  $("ku_hp").value  = uView.hp;
-  $("ku_atk").value = uView.atk;
-  $("ku_def").value = uView.def;
-  $("ku_agi").value = uView.agi;
+  $("ku_hp").value  = sol.u.hp;
+  $("ku_atk").value = sol.u.atk;
+  $("ku_def").value = sol.u.def;
+  $("ku_agi").value = sol.u.agi;
   $("ovr_check").checked = true;
 
   updateConsistency();
-  alert(`추정 완료: k=${sol.k}, u(view)=(${uView.hp},${uView.atk},${uView.def},${uView.agi})`);
+  alert(`추정 완료: k=${sol.k}, u=(${sol.u.hp},${sol.u.atk},${sol.u.def},${sol.u.agi})`);
 });
-
 
 ["ovr_check","ku_k","ku_hp","ku_atk","ku_def","ku_agi","s0_hp","s0_atk","s0_def","s0_agi","sg_hp","sg_atk","sg_def","sg_agi"]
   .forEach(id => $(id).addEventListener("input", updateConsistency));
@@ -771,19 +743,12 @@ function renderR8List(){
     cb.type = "checkbox"; cb.value = n; cb.disabled = !hasKU;
     lab.appendChild(cb);
 
-    const nameSpan = document.createElement('span');
-    nameSpan.className = "name";
-    nameSpan.textContent = n;
+    const nameSpan = document.createElement('span'); nameSpan.className = "name"; nameSpan.textContent = n;
     lab.appendChild(nameSpan);
 
-    const extra = document.createElement('span');
-    extra.className = "extra";
-    if(r?.ku_override){
-      const tag = document.createElement('span'); tag.className="tag warn"; tag.textContent="override"; extra.appendChild(tag);
-    }
-    if(!hasKU){
-      const tag = document.createElement('span'); tag.className="tag"; tag.textContent="k/u 없음"; extra.appendChild(tag);
-    }
+    const extra = document.createElement('span'); extra.className = "extra";
+    if(r?.ku_override){ const tag = document.createElement('span'); tag.className="tag warn"; tag.textContent="override"; extra.appendChild(tag); }
+    if(!hasKU){ const tag = document.createElement('span'); tag.className="tag"; tag.textContent="k/u 없음"; extra.appendChild(tag); }
     lab.appendChild(extra);
 
     box.appendChild(lab);
@@ -808,7 +773,7 @@ $("btnR8Run").addEventListener("click", async ()=>{
   for(const name of picks){
     const row = DB[name];
     if(!(Number.isFinite(row?.k) && row?.u)){ skipped.push({name,reason:"k/u 없음"}); continue; }
-    const sets = collectR8ObsForKU(row.k, row.u); // 내부에서 uEff=u+2 사용
+    const sets = collectR8ObsForKU(row.k, row.u);
     R8_RESULT[name] = sets || [];
   }
   const ms = Math.round(performance.now()-started);
@@ -897,8 +862,17 @@ async function loadRemote(){
 }
 (async function init(){
   const local = loadLS();
-  if(local && typeof local==="object"){ DB = local; sortNames(); renderList(); if(ORDER.length) loadForm(ORDER[0]); }
-  try{ await loadRemote(); }catch(e){ console.warn("원격 로드 실패, 로컬 캐시로 동작", e); if(!local){ DB={}; renderList(); renderR8List(); } }
+  if(local && typeof local==="object"){
+    DB = local;
+    sortNames(); renderList();
+    if(ORDER.length) loadForm(ORDER[0]);
+  }
+  try{
+    await loadRemote();
+  }catch(e){
+    console.warn("원격 로드 실패, 로컬 캐시로 동작", e);
+    if(!local){ DB={}; renderList(); renderR8List(); }
+  }
 })();
 </script>
 </body>
