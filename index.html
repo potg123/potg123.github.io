@@ -190,7 +190,7 @@
 <div class="grid">
   <!-- 좌: 펫 선택 -->
   <section class="card">
-    <h3>① 펫 선택</h3>
+    <h3>① 페트 선택</h3>
     <div class="row">
       <div class="col chooser">
         <label>초성 키패드</label>
@@ -1069,12 +1069,12 @@ return {matches, rank8, dist};
 
 /* ========= 계산 ========= */
 btnCalc.addEventListener('click', async ()=>{
-if(!selectedName){ alert("펫을 먼저 선택하세요."); return; }
+if(!selectedName){ alert("페트를 먼저 선택하세요."); return; }
 const obs=[obshp,obsatk,obsdef,obsagi].map(e=>parseInt(e.value,10));
 if(obs.some(v=>!Number.isFinite(v))){ alert("관측 표기치(정수)를 모두 입력하세요."); return; }
 
 const row=GLOBAL_TABLE[selectedName]||{};
-if(!row?.s0 || !row?.sg){ alert("이 펫은 S0/SG가 등록되어 있지 않습니다."); return; }
+if(!row?.s0 || !row?.sg){ alert("이 페트는 S0/SG가 등록되어 있지 않습니다."); return; }
 
 let k=row.k, u=row.u;
 if(!(Number.isFinite(k) && u && [u.hp,u.atk,u.def,u.agi].every(Number.isFinite))){
