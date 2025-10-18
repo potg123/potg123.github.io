@@ -1084,6 +1084,27 @@ selectedItemEl = null;
 renderPetList();
 });
 
+// ====== 정수(0 이상의 숫자만) 입력 가능 ======
+const intOnlyInputs = [obshp, obsatk, obsdef, obsagi];
+
+intOnlyInputs.forEach(input => {
+  // 소수점, e, 음수(-) 등 입력 차단
+  input.addEventListener('keydown', (e) => {
+    if (
+      e.key === '.' || e.key === ',' || 
+      e.key === 'e' || e.key === 'E' || 
+      e.key === '-'
+    ) {
+      e.preventDefault();
+    }
+  });
+
+  // 붙여넣기 시 숫자 이외 자동 제거
+  input.addEventListener('input', () => {
+    input.value = input.value.replace(/\D/g, ''); // 숫자만 남김
+  });
+});
+  
 /* ========= 부팅 ========= */
 (async function init(){
 console.log("[init] start");
