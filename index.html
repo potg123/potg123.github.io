@@ -465,7 +465,7 @@ function renderFavChips(){
 }
 function addFav(name){
   if(isFav(name)) return;
-  if(FAVS.length >= 5){ showToast("즐겨찾기는 최대 5마리까지 가능합니다."); return; }
+  if(FAVS.length >= 5){ showToast("즐겨찾기는 최대 5개까지 가능합니다."); return; }
   FAVS.push(name); saveFavs(); renderFavChips(); renderPetList(); showToast("즐겨찾기에 추가되었습니다.");
 }
 function removeFav(name){
