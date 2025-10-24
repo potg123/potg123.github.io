@@ -710,7 +710,7 @@ function renderPetList(){
     const favOn = isFav(n);
     star.className = 'tag fav' + (favOn ? ' on' : '');
     star.textContent = favOn ? '즐겨찾기' : '즐겨찾기';
-    star.title = favOn ? '즐겨찾기 해제' : '즐겨찾기 추가';
+    star.title = favOn ? '즐겨찾기 삭제' : '즐겨찾기 추가';
     star.setAttribute('role','button');
     star.setAttribute('aria-pressed', favOn ? 'true' : 'false');
     star.tabIndex = 0;
