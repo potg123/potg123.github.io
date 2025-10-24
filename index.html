@@ -470,7 +470,7 @@ function addFav(name){
 }
 function removeFav(name){
   const i = FAVS.indexOf(name);
-  if(i>=0){ FAVS.splice(i,1); saveFavs(); renderFavChips(); renderPetList(); showToast("즐겨찾기에서 제거했습니다."); }
+  if(i>=0){ FAVS.splice(i,1); saveFavs(); renderFavChips(); renderPetList(); showToast("즐겨찾기에 삭제되었습니다."); }
 }
 function toggleFav(name){ isFav(name) ? removeFav(name) : addFav(name); }
 
@@ -709,7 +709,7 @@ function renderPetList(){
     const star = document.createElement('span');
     const favOn = isFav(n);
     star.className = 'tag fav' + (favOn ? ' on' : '');
-    star.textContent = favOn ? '★' : '☆';
+    star.textContent = favOn ? '즐겨찾기' : '즐겨찾기';
     star.title = favOn ? '즐겨찾기 해제' : '즐겨찾기 추가';
     star.setAttribute('role','button');
     star.setAttribute('aria-pressed', favOn ? 'true' : 'false');
