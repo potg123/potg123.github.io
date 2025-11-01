@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>노바서버 페트 사전</title>
+<link rel="shortcut icon" href="#">
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161a22; --ink:#e8ecf3; --muted:#9aa1ad; --pri:#7aa2ff; --ring:#1f2632;
+    --earth-bg: rgba(0, 166, 81, .18);   /* ⬅️ 지 (초록) */
+    --earth-bd: rgba(0, 166, 81, .65);   /* ⬅️ 지 (초록) */
+    --earth-tx: #b9f6ca;
+    --water-bg: rgba(37, 75, 146, .18);  /* ⬅️ 수 (파랑) */
+    --water-bd: rgba(37, 75, 146, .65);  /* ⬅️ 수 (파랑) */
+    --water-tx: #cfe3ff;
+    --fire-bg: rgba(240, 0, 1, .18);     /* ⬅️ 화 (빨강) */
+    --fire-bd: rgba(240, 0, 1, .65);     /* ⬅️ 화 (빨강) */
+    --fire-tx: #ffcfcf;
+    --wind-bg: rgba(255, 119, 0, .18);   /* ⬅️ 풍 (주황) */
+    --wind-bd: rgba(255, 119, 0, .65);   /* ⬅️ 풍 (주황) */
+    --wind-tx: #fff2a8;
+    --grade-normal-bg: radial-gradient(120% 120% at 20% 20%, #f0f0f0 0%, #bfbfbf 70%, #909090 100%);
+    --grade-normal-tx: #0f1115;
+    --grade-adv-bg: radial-gradient(120% 120% at 20% 20%, #a8ffdf 0%, #2ecc71 70%, #0f8f4f 100%);
+    --grade-adv-tx: #0b1b14;
+    --grade-top-bg: radial-gradient(130% 130% at 30% 30%, #e8ffff 0%, #b8e6ff 45%, #9bd9ff 70%, #e6f7ff 100%);
+    --grade-top-tx: #0a1a22;
+    --toast-bg: #101826;
+    --toast-bd: #2a3a59;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:linear-gradient(180deg,#0f1115,#0c1016); color:var(--ink);
+       font:14px/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, Noto Sans KR, sans-serif;}
+  header{position:static; top:auto; background:rgba(15,17,21,.75); backdrop-filter: blur(8px);
+         border-bottom:1px solid #15202c; z-index:10;}
+  .wrap{max-width:1280px; margin:0 auto; padding:12px 16px}
+
+  /* === 상단바 반응형 정돈 === */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .topbar .title{min-width:0}
+  .topbar-actions{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+  @media (max-width: 760px){
+    .topbar{flex-wrap:wrap}
+    .topbar .title{flex: 1 0 100%}
+    .topbar-actions{flex: 1 0 100%; justify-content:flex-start; gap:8px}
+    #adminToolbar{order:1; width:100%; display:none;}
+    .backBtn, .adminLogin{order:2;}
+  }
+
+  .row{display:grid; gap:12px}
+  h1{margin:0 0 6px; font-size:18px}
+  .card{background:var(--panel); border:1px solid var(--ring); border-radius:14px; padding:12px}
+  label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+  label.section{font-size:14px; font-weight:800; color:#cbd5e1; margin-bottom:8px; letter-spacing:.2px}
+  input[type="number"], select, input[type="text"], input[type="password"]{width:100%; background:#101521; border:1px solid #1c2433; color:var(--ink); border-radius:10px; padding:8px 10px}
+  input[readonly]{opacity:.7; pointer-events:none}
+  .checks{display:flex; gap:10px; flex-wrap:wrap}
+  .check{display:flex; gap:6px; align-items:center; font-size:13px}
+  .btn{background:#141c29; border:1px solid #1c2433; color:var(--ink); padding:8px 12px; border-radius:10px; cursor:pointer; height:38px; display:inline-flex; align-items:center; justify-content:center}
+  .btn:hover{border-color:#2a364b}
+  .pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:2px 8px; border-radius:999px; background:#111826; border:1px solid #1c2433}
+  .muted{color:var(--muted)} .name{font-weight:800; font-size:16px}
+  .badge{display:inline-block; font-size:10px; padding:2px 6px; border-radius:999px; border:1px solid #314058; color:#98a3b7; margin-left:6px}
+  .grid2{display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:start}
+  @media (max-width: 1000px){ .grid2{grid-template-columns: 1fr} }
+  .lhs{display:grid; gap:12px} .rhs{display:grid; gap:12px}
+  .resultCard{display:flex; gap:12px; padding:12px; border:1px solid #1c2433; border-radius:12px; background:#0f141f}
+  .resultGrid{display:grid; grid-template-columns: 1fr; gap:12px; max-height: calc(100vh - 245px); overflow:auto; padding-right:4px}
+  .thumb{flex:0 0 25%; max-width:25%; background:#101521; border:1px solid #1c2433; border-radius:10px; display:flex; align-items:center; justify-content:center; overflow:hidden; min-height:180px; padding:10px}
+  .thumb img{max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; image-rendering:auto}
+  .info{flex:1 1 75%; display:grid; grid-template-rows: auto auto auto auto; gap:8px}
+  .rowline{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .kv{font-size:12px; color:var(--muted)}
+  .miniTable{border-collapse:collapse; width:auto; font-size:12px}
+  .miniTable th, .miniTable td{border:1px solid #263045; padding:6px 8px; text-align:center; white-space:nowrap}
+  .chips{display:flex; gap:6px; flex-wrap:wrap} .spacer{flex:1}
+  .attrWrap{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .oval{display:inline-flex; align-items:center; justify-content:center; /* min-width:32px; */ height:26px; padding:0 12px; border-radius:999px; font-weight:700; font-size:12px; letter-spacing:.2px; border:1px solid transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06)}
+  .a-earth{background:var(--earth-bg); border-color:var(--earth-bd); color:var(--earth-tx)} .a-water{background:var(--water-bg); border-color:var(--water-bd); color:var(--water-tx)}
+  .a-fire{background:var(--fire-bg); border-color:var(--fire-bd); color:var(--fire-tx)} .a-wind{background:var(--wind-bg); border-color:var(--wind-bd); color:var(--wind-tx)}
+  .oval.dom{box-shadow: 0 0 0 2px rgba(255,255,255,.06), 0 0 0 3px rgba(122,162,255,.18)}
+  .g-oval, .m-oval{display:inline-flex; align-items:center; justify-content:center; height:26px; padding:0 12px; border-radius:999px; font-weight:800; font-size:12px; letter-spacing:.3px; border:1px solid rgba(255,255,255,.15)}
+  .g-normal{background:var(--grade-normal-bg); color:var(--grade-normal-tx)} .g-adv{background:var(--grade-adv-bg); color:var(--grade-adv-tx)} .g-top{background:var(--grade-top-bg); color:var(--grade-top-tx)}
+  .m-yes{background: radial-gradient(120% 120% at 20% 20%, #a8ffdf 0%, #2ecc71 70%, #0f8f4f 100%); color:#0b1b14} .m-no{background: radial-gradient(120% 120% at 20% 20%, #d4d7dd 0%, #9aa1ad 65%, #6c7482 100%); color:#0f1115}
+  .toolbar{display:flex; gap:8px; align-items:center} .hidden{display:none!important}
+  .editPanel{display:none; grid-template-columns: 1fr auto; gap:8px; align-items:center} .editing .editPanel{display:grid}
+  .toggleEdit.btn.active{outline:2px solid #2a364b} .u-input{width:100%; background:#0f141f; border:1px solid #263045; color:var(--ink); border-radius:10px; padding:6px 8px}
+
+  /* backBtn/adminLogin 통일 스타일 */
+  .backBtn, .adminLogin{
+    background:#111826; border:1px dashed #223049; color:#a7b0c0; border-radius:10px;
+    padding:8px 12px; cursor:pointer; height:38px; display:inline-flex; align-items:center; justify-content:center;
+  }
+  .backBtn:hover, .adminLogin:hover{ border-color:#2a3a59; color:#c6d0e0; }
+
+  .dualAdv{display:none; margin-top:8px; gap:8px; grid-template-columns: 1fr 90px 1fr}
+  .dualAdv.active{display:grid}
+  .btnSm{height:36px; min-width:36px; padding:0 10px}
+  .toastWrap{position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:8px; z-index:1000}
+  .toast{background:var(--toast-bg); border:1px solid var(--toast-bd); color:#cfe3ff; padding:10px 12px; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,.3); opacity:0; transform:translateY(10px); transition: all .25s ease}
+  .toast.show{opacity:1; transform:translateY(0)}
+  .loading{padding:24px; text-align:center; color:#9aa1ad}
+  .gh-panel{display:none; grid-template-columns: repeat(3, 1fr); gap:8px; padding:10px; border:1px dashed #2a3a59; border-radius:12px; background:#0f141f; margin-top:10px}
+  .gh-panel.active{display:grid}
+  .gh-panel .wide{grid-column: 1 / -1}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <!-- 상단바: 반응형 -->
+    <div class="topbar">
+      <div class="title">
+        <h1>노바서버 페트 사전</h1>
+        <div class="muted">패치노트 v2.5 적용</div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="toolbar hidden" id="adminToolbar" style="display:none">
+          <button class="btn toggleEdit" id="toggleEditBtn">편집모드</button>
+          <button class="btn" id="exportCsv">CSV 내보내기</button>
+          <button class="btn" id="exportJson">JSON 내보내기</button>
+          <button class="btn" id="importJsonBtn">JSON 불러오기</button>
+          <input id="importJson" type="file" accept="application/json" class="hidden"/>
+          <button class="btn" id="githubBtn">GitHub 커밋</button>
+          <!-- 로그아웃 버튼 추가 -->
+          <button class="btn" id="adminLogoutBtn">로그아웃</button>
+        </div>
+        <a class="backBtn" id="backBtn" href="https://potg123.github.io/">페트 계산기</a>
+        <button class="adminLogin" id="adminLoginBtn">관리자</button>
+      </div>
+    </div>
+
+    <div id="ghPanel" class="gh-panel">
+      <div><label>Owner</label><input type="text" id="ghOwner" value="potg123"/></div>
+      <div><label>Repo</label><input type="text" id="ghRepo" value="potg123.github.io"/></div>
+      <div><label>Branch</label><input type="text" id="ghBranch" value="main"/></div>
+      <div class="wide"><label>Path</label><input type="text" id="ghPath" value="data/pets_filter.json"/></div>
+      <div class="wide"><label>Commit Message</label><input type="text" id="ghMsg" value="Update pets data via UI"/></div>
+      <div class="wide"><label>GitHub Token</label><input type="password" id="ghToken" placeholder="repo 권한 필요"/></div>
+      <div class="wide" style="display:flex; gap:8px">
+        <button class="btn" id="ghDoCommit">커밋 실행</button>
+        <div class="muted" id="ghStatus" style="align-self:center"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid2">
+    <section class="lhs">
+      <div class="card">
+        <label class="section">이름 검색</label>
+        <input type="text" id="q" placeholder="검색어를 입력해 주세요." />
+        <div class="checks" style="margin-top:8px">
+          <label class="check"><input type="checkbox" id="onlySearchable" checked/> 검색 가능한 페트만</label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row" style="grid-template-columns: 1fr;">
+          <div>
+            <label class="section">주 속성</label>
+            <select id="attrPick">
+              <option value="전체">전체</option>
+              <option value="지">지</option>
+              <option value="수">수</option>
+              <option value="화">화</option>
+              <option value="풍">풍</option>
+              <option value="듀얼">듀얼</option>
+            </select>
+          </div>
+          <div id="dualAdv" class="dualAdv">
+            <div>
+              <label class="section" style="margin-bottom:6px">듀얼 상위 값 (합계=10)</label>
+              <input type="number" id="dual_high" min="5" max="9" step="1" value="5" />
+            </div>
+            <div style="display:flex; align-items:end; gap:8px">
+              <button class="btn btnSm" id="dualDec">-1</button>
+              <button class="btn btnSm" id="dualInc">+1</button>
+            </div>
+            <div>
+              <label class="section" style="margin-bottom:6px">듀얼 하위 값 (자동=10-상위)</label>
+              <input type="number" id="dual_low" min="0" max="10" step="1" value="5" readonly />
+            </div>
+            <div class="wide" style="color:#9aa1ad; font-size:12px; margin-top:-2px">
+              정확히 2개 속성만 사용
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <label class="section" style="margin-bottom:4px">등급</label>
+            <div class="checks">
+              <label class="check"><input type="checkbox" class="grade" value="최상급" /> 최상급</label>
+              <label class="check"><input type="checkbox" class="grade" value="상급" /> 상급</label>
+              <label class="check"><input type="checkbox" class="grade" value="일반" /> 일반</label>
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <label class="section" style="margin-bottom:4px">탑승</label>
+            <div class="checks">
+              <label class="check"><input type="checkbox" class="mount" value="가능" checked/> 탑승 가능</label>
+              <label class="check"><input type="checkbox" class="mount" value="불가" checked/> 탑승 불가</label>
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <label class="section" style="margin-bottom:4px">획득 경로</label>
+            <div class="checks">
+              <label class="check"><input type="checkbox" class="channel" value="포획" /> 포획</label>
+              <label class="check"><input type="checkbox" class="channel" value="퀘스트" /> 퀘스트</label>
+              <label class="check"><input type="checkbox" class="channel" value="레이드" /> 레이드</label>
+              <label class="check"><input type="checkbox" class="channel" value="복권" /> 복권</label>
+              <label class="check"><input type="checkbox" class="channel" value="지원" /> 지원</label>
+              <label class="check"><input type="checkbox" class="channel" value="듀얼" /> 듀얼</label>
+              <label class="check"><input type="checkbox" class="channel" value="이벤트" /> 이벤트</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <label class="section">최소치 (이상)</label>
+        <div class="row" style="grid-template-columns: repeat(4, 1fr);">
+          <div><label>초기 내구력</label><input type="number" id="min_init_hp" step="0.01" placeholder="0"/></div>
+          <div><label>초기 공격력</label><input type="number" id="min_init_atk" step="0.01" placeholder="0"/></div>
+          <div><label>초기 방어력</label><input type="number" id="min_init_def" step="0.01" placeholder="0"/></div>
+          <div><label>초기 순발력</label><input type="number" id="min_init_agi" step="0.01" placeholder="0"/></div>
+        </div>
+        <div class="row" style="grid-template-columns: repeat(4, 1fr); margin-top:8px">
+          <div><label>성장 내구력</label><input type="number" id="min_grow_hp" step="0.01" placeholder="0"/></div>
+          <div><label>성장 공격력</label><input type="number" id="min_grow_atk" step="0.01" placeholder="0"/></div>
+          <div><label>성장 방어력</label><input type="number" id="min_grow_def" step="0.01" placeholder="0"/></div>
+          <div><label>성장 순발력</label><input type="number" id="min_grow_agi" step="0.01" placeholder="0"/></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rhs">
+      <div class="card">
+        <div class="row" style="grid-template-columns: auto 1fr auto; align-items:center">
+          <div class="chips" id="activeChips"></div>
+          <div class="spacer"></div>
+          <div class="pill"><strong id="countShow">0</strong>&nbsp;/&nbsp;<span id="totalShow">0</span> 개</div>
+        </div>
+        <div id="listWrap" class="resultGrid">
+          <div class="loading" id="loading">데이터를 불러오는 중…</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="toastWrap" id="toastWrap"></div>
+
+<script>
+/* ========= 데이터 경로 ========= */
+const DATA_URL_DEFAULT = `/data/pets_filter.json?ver=${Date.now()}`;
+let DATA_URL = DATA_URL_DEFAULT;
+
+let PETS = [];
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+let EDIT_MODE = false;
+let ADMIN = false;
+const ADMIN_HASH = "4f54b251f52001921456bc83c0b29e9fa08ab1c81e431f263a9be231309f68f4";
+
+/* ==== 관리자 세션(만료) 설정 ==== */
+const ADMIN_KEY = "pets_admin_unlocked_v2";      // 새 키(만료 포함)
+const ADMIN_TTL_MS = 30 * 60 * 1000;             // 30분 (원하는 값으로 조정)
+const USE_SESSION_ADMIN = false;                  // true: 탭/브라우저 닫으면 해제
+const ADMIN_STORAGE = USE_SESSION_ADMIN ? sessionStorage : localStorage;
+
+function isAdminAlive(){
+  try{
+    const raw = ADMIN_STORAGE.getItem(ADMIN_KEY);
+    if(!raw) return false;
+    const obj = JSON.parse(raw);
+    if(!obj || !obj.expires) return false;
+    if(Date.now() > obj.expires){ ADMIN_STORAGE.removeItem(ADMIN_KEY); return false; }
+    return true;
+  }catch{ return false; }
+}
+function refreshAdminTTL(){
+  ADMIN_STORAGE.setItem(ADMIN_KEY, JSON.stringify({ on:1, expires: Date.now() + ADMIN_TTL_MS }));
+}
+let adminTimer = null;
+function scheduleAdminAutoLock(){
+  clearTimeout(adminTimer);
+  if(!ADMIN) return;
+  const raw = ADMIN_STORAGE.getItem(ADMIN_KEY);
+  const exp = raw ? JSON.parse(raw).expires : Date.now();
+  const ms = Math.max(0, exp - Date.now());
+  adminTimer = setTimeout(()=>{
+    ADMIN = false;
+    ADMIN_STORAGE.removeItem(ADMIN_KEY);
+    render();
+    showToast("관리자 모드가 만료되었습니다.");
+  }, ms);
+}
+
+/* ========= UI 유틸 ========= */
+function showToast(msg, ms=1800) {
+  const wrap = $("#toastWrap");
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  wrap.appendChild(t);
+  void t.offsetWidth;
+  t.classList.add("show");
+  setTimeout(() => {
+    t.classList.remove("show");
+    setTimeout(() => wrap.removeChild(t), 250);
+  }, ms);
+}
+
+function dominantAttrs(attr) {
+  const keys = ["지","수","화","풍"];
+  const vals = keys.map(k=> (attr && typeof attr[k]==="number") ? attr[k] : 0);
+  const maxv = Math.max(...vals);
+  if (maxv <= 0) return [];
+  return keys.filter((k,i)=>vals[i]===maxv);
+}
+
+function isDualExactSum10(attr, high) {
+  const low = 10 - high;
+  const keys = ["지","수","화","풍"];
+  const vs = keys.map(k=> (attr && typeof attr[k]==="number") ? attr[k] : 0).filter(v=>v>0).sort((a,b)=>b-a);
+  if (vs.length !== 2) return false;
+  return (vs[0] === high && vs[1] === low);
+}
+
+function fmt(x) { return (x==null || Number.isNaN(x)) ? "—" : (Math.round(x*100)/100).toFixed(2); }
+
+function getFilters() {
+  const highInput = $("#dual_high");
+  let high = parseInt(highInput?.value || "5", 10);
+  if (Number.isNaN(high)) high = 5;
+  high = Math.max(5, Math.min(9, high));     // ⬅️ 9까지만
+  const low = 10 - high;
+  if ($("#dual_low")) $("#dual_low").value = String(low);
+  return {
+    q: $("#q").value.trim(),
+    onlySearchable: $("#onlySearchable").checked,
+    attrPick: $("#attrPick").value,
+    dualHigh: high,
+    dualLow: low,
+    grades: $$(".grade").filter(el=>el.checked).map(el=>el.value),
+    mounts: $$(".mount").filter(el=>el.checked).map(el=>el.value),
+    channels: $$(".channel").filter(el=>el.checked).map(el=>el.value),
+    min_init_hp: parseFloat($("#min_init_hp").value)||0,
+    min_init_atk: parseFloat($("#min_init_atk").value)||0,
+    min_init_def: parseFloat($("#min_init_def").value)||0,
+    min_init_agi: parseFloat($("#min_init_agi").value)||0,
+    min_grow_hp: parseFloat($("#min_grow_hp").value)||0,
+    min_grow_atk: parseFloat($("#min_grow_atk").value)||0,
+    min_grow_def: parseFloat($("#min_grow_def").value)||0,
+    min_grow_agi: parseFloat($("#min_grow_agi").value)||0,
+  };
+}
+
+function match(p, f) {
+  if (f.onlySearchable && !p.searchable) return false;
+  if (f.q) {
+    const ql = f.q.toLowerCase();
+    if (!(p.name||"").toLowerCase().includes(ql)) return false;
+  }
+  if (f.attrPick !== "전체") {
+    if (f.attrPick === "듀얼") {
+      if (!isDualExactSum10(p.attr, f.dualHigh)) return false;
+    } else {
+      const dom = dominantAttrs(p.attr);
+      if (!dom.includes(f.attrPick)) return false;
+    }
+  }
+  if (p.searchable) {
+    if (f.grades.length > 0 && !f.grades.includes(p.grade || "")) return false;
+    if (f.channels.length > 0 && !f.channels.includes(p.channel || "")) return false;
+  }
+  const mountState = p.mount ? "가능" : "불가";
+  if (f.mounts.length > 0 && !f.mounts.includes(mountState)) return false;
+
+  const I = p.init||{}, G = p.grow||{};
+  if (I.hp==null && f.min_init_hp>0) return false;
+  if (I.atk==null && f.min_init_atk>0) return false;
+  if (I.def==null && f.min_init_def>0) return false;
+  if (I.agi==null && f.min_init_agi>0) return false;
+  if (G.hp==null && f.min_grow_hp>0) return false;
+  if (G.atk==null && f.min_grow_atk>0) return false;
+  if (G.def==null && f.min_grow_def>0) return false;
+  if (G.agi==null && f.min_grow_agi>0) return false;
+
+  if ((I.hp||0)  < f.min_init_hp) return false;
+  if ((I.atk||0) < f.min_init_atk) return false;
+  if ((I.def||0) < f.min_init_def) return false;
+  if ((I.agi||0) < f.min_init_agi) return false;
+  if ((G.hp||0)  < f.min_grow_hp) return false;
+  if ((G.atk||0) < f.min_grow_atk) return false;
+  if ((G.def||0)  < f.min_grow_def) return false;
+  if ((G.agi||0)  < f.min_grow_agi) return false;
+
+  return true;
+}
+
+function chip(text, onClear) {
+  const el = document.createElement("span");
+  el.className = "pill";
+  el.textContent = text;
+  if (onClear) {
+    el.style.cursor = "pointer";
+    el.title = "이 필터 지우기";
+    el.onclick = onClear;
+  }
+  return el;
+}
+
+function attrOval(k, v, isDom){
+  const span = document.createElement("span");
+  const cls = { "지":"a-earth", "수":"a-water", "화":"a-fire", "풍":"a-wind" }[k] || "";
+  span.className = "oval " + cls + (isDom ? " dom" : "");
+  span.textContent = k + "(" + v + ")";
+  span.title = k;
+  return span;
+}
+
+function gradeOval(grade){
+  if(!grade) return null;
+  const span = document.createElement("span");
+  span.className = "g-oval " + (grade==="일반" ? "g-normal" : grade==="상급" ? "g-adv" : "g-top");
+  span.textContent = grade;
+  return span;
+}
+
+function mountOval(isMount){
+  const span = document.createElement("span");
+  span.className = "m-oval " + (isMount ? "m-yes" : "m-no");
+  span.textContent = isMount ? "탑승 가능" : "탑승 불가";
+  return span;
+}
+
+function makeEditPanel(p){
+  const wrap = document.createElement("div");
+  wrap.className = "editPanel";
+
+  const left = document.createElement("div");
+  const url = document.createElement("input");
+  url.type = "text"; url.placeholder = "GIF URL"; url.value = p.img || "";
+  url.className = "u-input";
+  left.appendChild(url);
+
+  const right = document.createElement("div");
+  right.className = "rowline";
+  const cbLabel = document.createElement("label");
+  cbLabel.className = "check";
+  const cb = document.createElement("input");
+  cb.type = "checkbox"; cb.checked = !!p.mount;
+  cbLabel.appendChild(cb);
+  cbLabel.append(" 탑승 가능");
+  const apply = document.createElement("button");
+  apply.className = "btn"; apply.textContent = "적용";
+  right.appendChild(cbLabel);
+  right.appendChild(apply);
+
+  wrap.appendChild(left);
+  wrap.appendChild(right);
+
+  apply.addEventListener("click", ()=>{ if (!ADMIN) return; p.img = url.value.trim(); p.mount = !!cb.checked; render(); });
+
+  return wrap;
+}
+
+function petCard(p) {
+  const dom = dominantAttrs(p.attr);
+  const init = p.init||{}, grow = p.grow||{};
+
+  const card = document.createElement("div");
+  card.className = "resultCard" + ((EDIT_MODE && ADMIN) ? " editing" : "");
+
+  const thumb = document.createElement("div");
+  thumb.className = "thumb";
+  if (p.img) {
+    const img = document.createElement("img");
+    img.src = p.img; img.alt = p.name;
+    thumb.appendChild(img);
+  } else {
+    thumb.textContent = "GIF";
+  }
+
+  const info = document.createElement("div");
+  info.className = "info";
+
+  const r1 = document.createElement("div");
+  r1.className = "rowline";
+  const name = document.createElement("div");
+  name.className = "name";
+  name.textContent = p.name || "—";
+  r1.appendChild(name);
+  if (!p.searchable) {
+    const b = document.createElement("span");
+    b.className = "badge";
+    b.textContent = "검색 불가";
+    r1.appendChild(b);
+  }
+  r1.appendChild(mountOval(!!p.mount));
+  const g = gradeOval(p.grade);
+  if (g) r1.appendChild(g);
+  info.appendChild(r1);
+
+  const r2 = document.createElement("div");
+  const t = document.createElement("table");
+  t.className = "miniTable";
+  t.innerHTML = `
+    <thead>
+      <tr><th></th><th>내구력</th><th>공격력</th><th>방어력</th><th>순발력</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>초기</th><td>${fmt(init.hp)}</td><td>${fmt(init.atk)}</td><td>${fmt(init.def)}</td><td>${fmt(init.agi)}</td></tr>
+      <tr><th>성장</th><td>${fmt(grow.hp)}</td><td>${fmt(grow.atk)}</td><td>${fmt(grow.def)}</td><td>${fmt(grow.agi)}</td></tr>
+    </tbody>
+  `;
+  r2.appendChild(t);
+  info.appendChild(r2);
+
+  const r3 = document.createElement("div");
+  r3.className = "attrWrap";
+  ["지","수","화","풍"].forEach(k=>{
+    const isDom = dom.includes(k);
+    const v = (p.attr && typeof p.attr[k]==="number") ? p.attr[k] : 0;
+    if (v > 0) {
+      r3.appendChild(attrOval(k, v, isDom));
+    }  
+  });
+  info.appendChild(r3);
+
+  const r4 = document.createElement("div");
+  r4.className = "kv";
+  r4.textContent = p.route || "";
+  info.appendChild(r4);
+
+  const ep = makeEditPanel(p);
+  info.appendChild(ep);
+
+  card.appendChild(thumb);
+  card.appendChild(info);
+  return card;
+}
+
+function sortRows(rows, f) {
+  const key = f.attrPick;
+
+  // 전체 또는 듀얼이면 이름 가나다순
+  if (!key || key === "전체" || key === "듀얼") {
+    return rows.slice().sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  }
+
+  // 특정 속성 선택 시 속성 값 내림차순 + 이름순
+  return rows.slice().sort((a, b) => {
+    const va = (a.attr && typeof a.attr[key] === "number") ? a.attr[key] : 0;
+    const vb = (b.attr && typeof b.attr[key] === "number") ? b.attr[key] : 0;
+    if (vb !== va) return vb - va; // 속성 높은 순
+    return (a.name || "").localeCompare(b.name || ""); // 값 같으면 이름순
+  });
+}
+
+function ensureMountAtLeastOne(e) {
+  render(); // 그냥 렌더만 실행
+}
+
+function render() {
+  const f = getFilters();
+  let rows = PETS.filter(p => match(p, f));
+  rows = sortRows(rows, f);
+
+  $("#totalShow").textContent = PETS.length;
+  $("#countShow").textContent = rows.length;
+
+  const chips = $("#activeChips");
+  chips.innerHTML = "";
+  if (f.q) chips.appendChild(chip(`이름: "${f.q}"`, ()=>{ $("#q").value=""; render(); }));
+  if (f.onlySearchable) chips.appendChild(chip("검색 가능만", ()=>{ $("#onlySearchable").checked=false; render(); }));
+  if (f.attrPick!=="전체") {
+    if (f.attrPick==="듀얼") chips.appendChild(chip(`듀얼 = ${f.dualHigh}/${f.dualLow}(합계10)`, ()=>{ $("#attrPick").value="전체"; render(); }));
+    else chips.appendChild(chip(`주속성: ${f.attrPick}`, ()=>{ $("#attrPick").value="전체"; render(); }));
+  }
+  const checkedGrades = $$(".grade").filter(c=>c.checked);
+  if (checkedGrades.length > 0) {
+    checkedGrades.forEach(c=>{
+      chips.appendChild(chip(`등급 포함: ${c.value}`, ()=>{
+        c.checked = false; // 클릭 시 해당 필터 해제
+        render();
+      }));
+    });
+  }
+  const checkedChannels = $$(".channel").filter(c=>c.checked);
+  if (checkedChannels.length > 0) {
+    checkedChannels.forEach(c=>{
+      chips.appendChild(chip(`획득경로 포함: ${c.value}`, ()=>{
+        c.checked = false; // 클릭 시 해당 필터 해제
+        render();
+      }));
+    });
+  }
+  const mountAll = f.mounts.length===2;
+  if (!mountAll) {
+    chips.appendChild(chip(`탑승: ${f.mounts.join("/")}`, ()=>{ $$(".mount").forEach(m=>m.checked=true); render(); }));
+  }
+  ["init_hp","init_atk","init_def","init_agi","grow_hp","grow_atk","grow_def","grow_agi"].forEach(k=>{
+    const key = "min_"+k, v = f[key];
+    if (v>0) chips.appendChild(chip(`최소 ${k.replace('_',' ').toUpperCase()}: ${v}`, ()=>{ $("#"+key).value=""; render(); }));
+  });
+
+  const grid = $("#listWrap");
+  grid.innerHTML = "";
+  if (rows.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "loading";
+    empty.textContent = "조건에 맞는 페트가 없습니다.";
+    grid.appendChild(empty);
+  } else {
+    rows.forEach(p => grid.appendChild(petCard(p)));
+  }
+
+  const adminTb = $("#adminToolbar");
+  if (ADMIN) { adminTb.classList.remove("hidden"); adminTb.style.display="flex"; }
+  else { adminTb.classList.add("hidden"); adminTb.style.display="none"; }
+  $("#adminLoginBtn").classList.toggle("hidden", ADMIN);
+
+  const toggleBtn = $("#toggleEditBtn");
+  if (toggleBtn) toggleBtn.textContent = (EDIT_MODE && ADMIN) ? "편집모드 해제" : "편집모드";
+
+  const dv = document.getElementById("dualAdv");
+  if (dv) dv.classList.toggle("active", $("#attrPick").value === "듀얼");
+}
+
+function bindFilterEvents() {
+  // 이름 검색
+  document.querySelector("#q")?.addEventListener("input", render);
+  // 검색 가능만
+  document.querySelector("#onlySearchable")?.addEventListener("change", render);
+  // 주 속성 선택
+  document.querySelector("#attrPick")?.addEventListener("change", render);
+  // 등급 체크박스
+  document.querySelectorAll(".grade").forEach(el => el.addEventListener("change", render));
+  // 획득경로 체크박스
+  document.querySelectorAll(".channel").forEach(el => el.addEventListener("change", render));
+  // 탑승 체크박스 (최소 1개 유지)
+  document.querySelectorAll(".mount").forEach(el => {
+    el.removeEventListener?.("change", ensureMountAtLeastOne);
+    el.addEventListener("change", ensureMountAtLeastOne);
+  });
+  // 최소치 입력들
+  [
+    "min_init_hp","min_init_atk","min_init_def","min_init_agi",
+    "min_grow_hp","min_grow_atk","min_grow_def","min_grow_agi"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", render);
+    el.addEventListener("change", render);
+  });
+}
+
+function toCSV(rows) {
+  const headers = ["name","searchable","grade","attr_지","attr_수","attr_화","attr_풍","dom_attr","init_hp","init_atk","init_def","init_agi","grow_hp","grow_atk","grow_def","grow_agi","route","mount","img"];
+  const esc = (v) => {
+    if (v==null) return "";
+    const s = String(v).replace(/"/g,'""');
+    return '"' + s + '"';
+  };
+  const lines = [headers.join(",")];
+  rows.forEach(p=>{
+    const dom = dominantAttrs(p.attr);
+    lines.push([
+      p.name,
+      p.searchable,
+      p.grade||"",
+      p.attr?.지||0, p.attr?.수||0, p.attr?.화||0, p.attr?.풍||0,
+      dom.join("/"),
+      p.init?.hp??"", p.init?.atk??"", p.init?.def??"", p.init?.agi??"",
+      p.grow?.hp??"", p.grow?.atk??"", p.grow?.def??"", p.grow?.agi??"",
+      p.route||"",
+      p.mount ? "1":"0",
+      p.img||""
+    ].map(esc).join(","));
+  });
+  return lines.join("\n");
+}
+
+function download(filename, text, mime="text/plain;charset=utf-8") {
+  const blob = new Blob([text], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+function currentFiltered() {
+  const f = getFilters();
+  let rows = PETS.filter(p => match(p, f));
+  rows = sortRows(rows, f);
+  return rows;
+}
+
+async function sha256Hex(str) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest("SHA-256", enc.encode(str));
+  const bytes = new Uint8Array(buf);
+  return Array.from(bytes).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+async function adminUnlock() {
+  const saved = ADMIN_STORAGE.getItem(ADMIN_KEY);
+  if (saved && isAdminAlive()) { ADMIN = true; return true; }
+  const pw = prompt("관리자 비밀번호를 입력하세요");
+  if (!pw) return false;
+  try {
+    const h = await sha256Hex(pw);
+    if (h === ADMIN_HASH) {
+      ADMIN = true;
+      refreshAdminTTL();        // 만료 갱신 저장
+      scheduleAdminAutoLock();  // 자동 해제 타이머
+      showToast("관리자 모드가 활성화되었습니다.");
+      return true;
+    } else {
+      showToast("비밀번호가 올바르지 않습니다.");
+      return false;
+    }
+  } catch(err) {
+    showToast("해시 계산 중 오류: " + err.message);
+    return false;
+  }
+}
+
+/* ========== 이벤트 바인딩 ========== */
+$("#adminLoginBtn").addEventListener("click", async ()=>{ await adminUnlock(); render(); });
+$("#toggleEditBtn")?.addEventListener("click", ()=>{ if (!ADMIN) return; EDIT_MODE = !EDIT_MODE; render(); });
+$("#exportCsv")?.addEventListener("click", ()=>{ if(!ADMIN) return; const rows = currentFiltered(); download("stoneage_pets_filtered.csv", toCSV(rows), "text/csv;charset=utf-8"); });
+$("#exportJson")?.addEventListener("click", ()=>{ if(!ADMIN) return; download("pets_filter.json", JSON.stringify(PETS, null, 2), "application/json;charset=utf-8"); });
+$("#importJsonBtn")?.addEventListener("click", ()=>{ if(!ADMIN) return; $("#importJson").click(); });
+$("#importJson")?.addEventListener("change", (e)=>{ if (!ADMIN) return;
+  const file = e.target.files?.[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{ try{ const arr = JSON.parse(reader.result);
+      if(!Array.isArray(arr)) throw new Error("JSON은 배열이어야 합니다.");
+      const byName = Object.fromEntries(PETS.map(p=>[p.name,p]));
+      arr.forEach(obj=>{ if(!obj || typeof obj!=="object") return;
+        const name = obj.name; if(!name) return;
+        byName[name] = Object.assign({}, byName[name]||{}, obj);
+      });
+      PETS.length = 0; Object.values(byName).forEach(v=>PETS.push(v));
+      render(); e.target.value = ""; showToast("JSON 병합 완료");
+    }catch(err){ showToast("JSON 파싱 실패: " + err.message); }
+  };
+  reader.readAsText(file, "utf-8");
+});
+$("#githubBtn")?.addEventListener("click", ()=>{ if(!ADMIN) return;
+  const pnl = $("#ghPanel");
+  pnl.classList.toggle("active");
+});
+$("#adminLogoutBtn")?.addEventListener("click", ()=>{
+  ADMIN = false;
+  ADMIN_STORAGE.removeItem(ADMIN_KEY);
+  localStorage.removeItem("pets_admin_unlocked"); // 구버전 잔여키도 정리
+  render();
+  showToast("관리자 모드를 해제했습니다.");
+});
+
+/* 활동 시 TTL 자동 연장(선택) */
+["click","keydown","touchstart"].forEach(ev=>{
+  document.addEventListener(ev, ()=>{
+    if(ADMIN && isAdminAlive()){ refreshAdminTTL(); scheduleAdminAutoLock(); }
+  }, {passive:true});
+});
+
+/* ========= GitHub 커밋 도우미 ========= */
+function b64EncodeUnicode(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+async function githubCommit(owner, repo, branch, path, message, token, jsonText) {
+  const base = "https://api.github.com";
+  const headers = {
+    "Accept": "application/vnd.github+json",
+    "Authorization": "Bearer " + token
+  };
+  let sha = null;
+  try {
+    const res = await fetch(`${base}/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`, {headers});
+    if (res.status === 200) {
+      const data = await res.json();
+      sha = data.sha;
+    }
+  } catch (e) {}
+  const body = { message, content: b64EncodeUnicode(jsonText), branch };
+  if (sha) body.sha = sha;
+  const putRes = await fetch(`${base}/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
+    method:"PUT",
+    headers: Object.assign({"Content-Type":"application/json"}, headers),
+    body: JSON.stringify(body)
+  });
+  if (!putRes.ok) {
+    const t = await putRes.text();
+    throw new Error(`GitHub 오류: ${putRes.status} ${putRes.statusText}\n${t}`);
+  }
+  return putRes.json();
+}
+$("#ghDoCommit")?.addEventListener("click", async ()=>{ if(!ADMIN) return;
+  const owner = $("#ghOwner").value.trim();
+  const repo = $("#ghRepo").value.trim();
+  const branch = $("#ghBranch").value.trim() || "main";
+  const path = $("#ghPath").value.trim() || "data/pets_filter.json";
+  const msg = $("#ghMsg").value.trim() || "Update pets data via UI";
+  const token = $("#ghToken").value.trim();
+  const status = $("#ghStatus");
+  status.textContent = "커밋 중…";
+  try {
+    const jsonText = JSON.stringify(PETS, null, 2);
+    const result = await githubCommit(owner, repo, branch, path, msg, token, jsonText);
+    status.innerHTML = `성공! <a href="${result.content?.html_url||'#'}" target="_blank" style="color:#7aa2ff">커밋 파일 보기</a>`;
+    await loadPets(true);
+    showToast("원격 JSON 업데이트 및 재로드 완료");
+  } catch (err) {
+    status.textContent = err.message;
+    showToast("커밋 실패: " + err.message);
+  }
+});
+
+/* ========= 듀얼 상위값 10 방지 + 안내 ========= */
+let prevDualHigh = 5;
+function syncDualLow() {
+  const high = Math.max(5, Math.min(9, parseInt($("#dual_high")?.value || String(prevDualHigh), 10)));
+  const low = 10 - high;
+  if ($("#dual_low")) $("#dual_low").value = String(low);
+}
+const dualHighEl = $("#dual_high");
+if (dualHighEl) {
+  const handleDualHigh = (e) => {
+    let v = parseInt(e.target.value || "5", 10);
+    if (Number.isNaN(v)) v = prevDualHigh;
+    if (v < 5) {
+      showToast("듀얼 상위 값은 5 이상이어야 합니다.");
+      e.target.value = String(prevDualHigh);
+      syncDualLow();
+      return;
+    }
+    if (v >= 10) { // 10 방지 + 안내
+      showToast("주 속성 10은 지,수,화,풍 데이터를 이용하세요.");
+      v = 9;
+    }
+    if (v > 9) v = 9;
+    e.target.value = String(v);
+    prevDualHigh = v;
+    syncDualLow();
+    render();
+  };
+  dualHighEl.addEventListener("input", handleDualHigh);
+  dualHighEl.addEventListener("change", handleDualHigh);
+}
+$("#dualDec")?.addEventListener("click", ()=>{
+  const el = $("#dual_high");
+  let v = parseInt(el.value||"5",10);
+  if (v>5) { v--; el.value=String(v); prevDualHigh=v; syncDualLow(); render(); }
+  else showToast("듀얼 상위 값은 5 이상이어야 합니다.");
+});
+$("#dualInc")?.addEventListener("click", ()=>{
+  const el = $("#dual_high");
+  let v = parseInt(el.value||"5",10);
+  if (v<9) {
+    v++; el.value=String(v); prevDualHigh=v; syncDualLow(); render();
+  } else {
+    showToast("주 속성 10은 지,수,화,풍 데이터를 이용하세요.");
+  }
+});
+
+/* ========= 데이터 로드 ========= */
+async function loadPets(force=false) {
+  try {
+    $("#loading")?.classList.remove("hidden");
+    const res = await fetch(DATA_URL + (force ? ("?t="+Date.now()) : ""));
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const arr = await res.json();
+    if (!Array.isArray(arr)) throw new Error("JSON 최상위는 배열이어야 합니다.");
+    PETS = arr;
+    $("#totalShow").textContent = PETS.length;
+    render();
+  } catch (err) {
+    showToast("데이터 로드 실패: " + err.message);
+    const wrap = $("#listWrap");
+    if (wrap) { wrap.innerHTML = '<div class="loading">데이터를 불러오지 못했습니다. 경로와 CORS 설정을 확인해 주세요.</div>'; }
+  } finally {
+    $("#loading")?.classList.add("hidden");
+  }
+}
+
+/* ========= 부팅 ========= */
+/* 구버전 키 → 만료 키로 1회 이관 */
+if (localStorage.getItem("pets_admin_unlocked") === "1") {
+  localStorage.removeItem("pets_admin_unlocked");
+  ADMIN_STORAGE.setItem(ADMIN_KEY, JSON.stringify({ on:1, expires: Date.now() + ADMIN_TTL_MS }));
+}
+ADMIN = isAdminAlive();
+if (ADMIN) { scheduleAdminAutoLock(); }
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  $$(".mount").forEach(el=>el.addEventListener("change", render));
+  const dv = document.getElementById("dualAdv");
+  if (dv) dv.classList.toggle("active", $("#attrPick").value === "듀얼");
+  syncDualLow();
+  bindFilterEvents();
+  loadPets();
+  render();
+});
+</script>
+</body>
+</html>
